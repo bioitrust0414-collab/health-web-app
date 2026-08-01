@@ -1,4 +1,4 @@
-import { Check, Coffee } from "lucide-react";
+import { Check, Footprints } from "lucide-react";
 import { member } from "@/lib/member-data";
 
 export function StampCard() {
@@ -8,9 +8,9 @@ export function StampCard() {
     <section className="surface-card p-5 md:p-8">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
         <div className="min-w-0">
-          <h2 className="truncate text-base font-bold">本月集點卡</h2>
+          <h2 className="truncate text-base font-bold">本月健康任務</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            集滿 {member.stampGoal} 杯送一杯手沖，還差 {member.stampGoal - member.stamps} 杯
+            達成 {member.stampGoal} 天步數目標送 200 點，還差 {member.stampGoal - member.stamps} 天
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-foreground tabular-nums">
@@ -29,20 +29,20 @@ export function StampCard() {
             }
             style={filled ? { animationDelay: `${i * 45}ms` } : undefined}
           >
-            {filled ? <Check className="h-5 w-5" /> : <Coffee className="h-5 w-5 opacity-50" />}
+            {filled ? <Check className="h-5 w-5" /> : <Footprints className="h-5 w-5 opacity-50" />}
           </div>
         ))}
       </div>
 
       <div className="mt-6 rounded-xl bg-primary-soft p-4">
         <div className="flex items-center justify-between text-xs font-medium text-accent-foreground">
-          <span>升級白金會員</span>
+          <span>升級白金健康會員</span>
           <span className="tabular-nums">還需 {member.pointsToNextTier} 點</span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-card">
           <div
             className="h-full rounded-full bg-primary transition-all"
-            style={{ width: `${Math.round((1280 / 1500) * 100)}%` }}
+            style={{ width: `${Math.round((member.points / 1500) * 100)}%` }}
           />
         </div>
       </div>

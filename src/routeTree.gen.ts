@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as MemberRouteImport } from './routes/member'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as RewardsRouteImport } from './routes/rewards'
 import { Route as ShopRouteImport } from './routes/shop'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MemberRoute = MemberRouteImport.update({
+  id: '/member',
+  path: '/member',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsRoute = ReportsRouteImport.update({
@@ -44,6 +50,7 @@ const ShopRoute = ShopRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/rewards': typeof RewardsRoute
   '/shop': typeof ShopRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/rewards': typeof RewardsRoute
   '/shop': typeof ShopRoute
@@ -59,21 +67,30 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/history': typeof HistoryRoute
+  '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/rewards': typeof RewardsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/history' | '/reports' | '/rewards' | '/shop'
+  fullPaths: '/' | '/history' | '/member' | '/reports' | '/rewards' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/history' | '/reports' | '/rewards' | '/shop'
-  id: '__root__' | '/' | '/history' | '/reports' | '/rewards' | '/shop'
+  to: '/' | '/history' | '/member' | '/reports' | '/rewards' | '/shop'
+  id:
+    | '__root__'
+    | '/'
+    | '/history'
+    | '/member'
+    | '/reports'
+    | '/rewards'
+    | '/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HistoryRoute: typeof HistoryRoute
+  MemberRoute: typeof MemberRoute
   ReportsRoute: typeof ReportsRoute
   RewardsRoute: typeof RewardsRoute
   ShopRoute: typeof ShopRoute
@@ -93,6 +110,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/member': {
+      id: '/member'
+      path: '/member'
+      fullPath: '/member'
+      preLoaderRoute: typeof MemberRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reports': {
@@ -122,6 +146,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HistoryRoute: HistoryRoute,
+  MemberRoute: MemberRoute,
   ReportsRoute: ReportsRoute,
   RewardsRoute: RewardsRoute,
   ShopRoute: ShopRoute,
