@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as MemberRouteImport } from './routes/member'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as AuthLineCallbackRouteImport } from './routes/auth.line.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
+  id: '/auth/line/callback',
+  path: '/auth/line/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/shop': typeof ShopRoute
+  '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/shop': typeof ShopRoute
+  '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,15 @@ export interface FileRoutesById {
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/shop': typeof ShopRoute
+  '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/member' | '/reports' | '/shop'
+  fullPaths: '/' | '/member' | '/reports' | '/shop' | '/auth/line/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/member' | '/reports' | '/shop'
-  id: '__root__' | '/' | '/member' | '/reports' | '/shop'
+  to: '/' | '/member' | '/reports' | '/shop' | '/auth/line/callback'
+  id:
+    '__root__' | '/' | '/member' | '/reports' | '/shop' | '/auth/line/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +77,7 @@ export interface RootRouteChildren {
   MemberRoute: typeof MemberRoute
   ReportsRoute: typeof ReportsRoute
   ShopRoute: typeof ShopRoute
+  AuthLineCallbackRoute: typeof AuthLineCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +110,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/line/callback': {
+      id: '/auth/line/callback'
+      path: '/auth/line/callback'
+      fullPath: '/auth/line/callback'
+      preLoaderRoute: typeof AuthLineCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,7 +125,18 @@ const rootRouteChildren: RootRouteChildren = {
   MemberRoute: MemberRoute,
   ReportsRoute: ReportsRoute,
   ShopRoute: ShopRoute,
+  AuthLineCallbackRoute: AuthLineCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
