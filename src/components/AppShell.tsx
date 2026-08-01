@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { CreditCard, Gift, History } from "lucide-react";
+import { Activity, CreditCard, FileHeart, ShoppingBag } from "lucide-react";
 import { useLiffEnvironment } from "@/lib/use-liff";
 
 const navItems = [
-  { to: "/", label: "會員卡", icon: CreditCard },
-  { to: "/rewards", label: "兌換好禮", icon: Gift },
-  { to: "/history", label: "點數紀錄", icon: History },
+  { to: "/", label: "健康首頁", icon: Activity },
+  { to: "/reports", label: "健檢報告", icon: FileHeart },
+  { to: "/shop", label: "健康商城", icon: ShoppingBag },
+  { to: "/member", label: "會員卡", icon: CreditCard },
 ] as const;
 
 export function AppShell({
@@ -27,11 +28,11 @@ export function AppShell({
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary-foreground/20 text-lg font-bold">
-                豆
+                康
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold tracking-wide opacity-90">
-                  綠豆咖啡 GreenBean
+                  康活健康 KanLife
                 </p>
                 <p className="truncate text-xs opacity-70">
                   {isInClient ? "LINE 內開啟" : "網頁版"}
@@ -63,7 +64,7 @@ export function AppShell({
       <main className="mx-auto -mt-6 max-w-5xl px-5 md:px-8">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-3">
+        <div className="mx-auto grid max-w-md grid-cols-4">
           {navItems.map((item) => (
             <Link
               key={item.to}
