@@ -101,9 +101,14 @@ function HealthHome() {
           <ul className="mt-4 grid gap-3 sm:grid-cols-3">
             {products.slice(0, 3).map((p) => (
               <li key={p.id} className="flex items-center gap-3 rounded-xl bg-secondary p-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-card text-xl">
-                  {p.emoji}
-                </span>
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  loading="lazy"
+                  width={768}
+                  height={576}
+                  className="h-12 w-12 shrink-0 rounded-xl object-cover"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold">{p.name}</p>
                   <p className="text-xs font-bold text-primary tabular-nums">
