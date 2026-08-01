@@ -70,8 +70,11 @@ function MemberPage() {
                 const affordable = member.points >= reward.cost;
                 return (
                   <li key={reward.id} className="flex items-center gap-3 rounded-xl bg-secondary p-3">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-card text-xl">
-                      {reward.emoji}
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-card text-primary">
+                      {(() => {
+                        const Icon = rewardIcons[reward.icon];
+                        return <Icon className="h-5 w-5" />;
+                      })()}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">{reward.title}</p>
