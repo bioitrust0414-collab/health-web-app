@@ -22,7 +22,7 @@ export function MemberCard() {
           </div>
         </div>
 
-        <p className="mt-6 text-xs tracking-[0.3em] opacity-80">會員條碼</p>
+        <p className="mt-6 text-xs tracking-[0.3em] opacity-80">健康會員條碼</p>
       </div>
 
       <div className="px-5 pt-4 pb-6 md:px-8">
@@ -39,7 +39,7 @@ export function MemberCard() {
           {member.memberId}
         </p>
         <p className="mt-1 text-center text-xs text-muted-foreground">
-          結帳時出示此條碼即可累積點數
+          門市結帳或健檢報到時出示此條碼
         </p>
       </div>
     </section>
