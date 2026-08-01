@@ -17,16 +17,16 @@ export function StepsChart() {
 
       <div className="mt-6 flex h-40 items-end gap-2">
         {weeklySteps.map((d) => (
-          <div key={d.day} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+          <div key={d.day} className="flex h-full min-w-0 flex-1 flex-col items-center gap-2">
             <span className="text-[10px] font-medium text-muted-foreground tabular-nums">
               {(d.steps / 1000).toFixed(1)}k
             </span>
-            <div className="flex w-full flex-1 items-end">
+            <div className="relative min-h-0 w-full flex-1">
               <div
                 className={
                   d.steps >= 10000
-                    ? "w-full rounded-t-lg bg-primary"
-                    : "w-full rounded-t-lg bg-primary/35"
+                    ? "absolute inset-x-0 bottom-0 rounded-t-lg bg-primary"
+                    : "absolute inset-x-0 bottom-0 rounded-t-lg bg-primary/35"
                 }
                 style={{ height: `${(d.steps / max) * 100}%` }}
               />
