@@ -63,8 +63,15 @@ function ShopPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((p) => (
             <article key={p.id} className="surface-card flex flex-col p-5">
-              <div className="grid aspect-[4/3] place-items-center rounded-xl bg-accent text-5xl">
-                {p.emoji}
+              <div className="overflow-hidden rounded-xl bg-accent">
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  loading="lazy"
+                  width={768}
+                  height={576}
+                  className="aspect-[4/3] w-full object-cover"
+                />
               </div>
               <div className="mt-4 flex items-start justify-between gap-2">
                 <h2 className="min-w-0 text-sm font-bold">{p.name}</h2>
