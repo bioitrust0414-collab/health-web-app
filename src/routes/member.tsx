@@ -1,4 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { HeartPulse, Pill, Salad, Scale } from "lucide-react";
+
+const rewardIcons = {
+  scale: Scale,
+  salad: Salad,
+  pill: Pill,
+  hospital: HeartPulse,
+} as const;
 import { AppShell } from "@/components/AppShell";
 import { MemberCard } from "@/components/MemberCard";
 import { StampCard } from "@/components/StampCard";
