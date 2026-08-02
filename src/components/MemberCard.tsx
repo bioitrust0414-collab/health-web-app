@@ -2,7 +2,8 @@ import { member } from "@/lib/member-data";
 
 const barWidths = [2, 4, 1, 3, 2, 5, 1, 2, 4, 2, 3, 1, 4, 2, 1, 3, 5, 2, 1, 4, 2, 3, 1, 2, 4, 1, 3, 2];
 
-export function MemberCard() {
+export function MemberCard({ points }: { points?: number | undefined } = {}) {
+  const displayPoints = points ?? member.points;
   return (
     <section className="surface-card overflow-hidden">
       <div className="brand-gradient shadow-brand px-5 py-6 text-primary-foreground md:px-8">
@@ -18,7 +19,7 @@ export function MemberCard() {
           </div>
           <div className="text-right">
             <p className="text-xs opacity-80">可用點數</p>
-            <p className="text-2xl font-bold tabular-nums">{member.points.toLocaleString()}</p>
+            <p className="text-2xl font-bold tabular-nums">{displayPoints.toLocaleString()}</p>
           </div>
         </div>
 

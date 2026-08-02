@@ -1,20 +1,25 @@
 import { Check, Footprints } from "lucide-react";
 import { member } from "@/lib/member-data";
 
-export function StampCard() {
-  const slots = Array.from({ length: member.stampGoal }, (_, i) => i < member.stamps);
+export function StampCard({
+  stamps,
+  stampGoal,
+}: { stamps?: number | undefined; stampGoal?: number | undefined } = {}) {
+  const displayStamps = stamps ?? member.stamps;
+  const displayGoal = stampGoal ?? member.stampGoal;
+  const slots = Array.from({ length: displayGoal }, (_, i) => i < displayStamps);
 
   return (
     <section className="surface-card p-5 md:p-8">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
         <div className="min-w-0">
-          <h2 className="truncate text-base font-bold">本月健康任務</h2>
+          <h2 className="truncate text-base font-bold">健康集點卡</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            達成 {member.stampGoal} 天步數目標送 200 點，還差 {member.stampGoal - member.stamps} 天
+            每完成一次預約集一點，集滿 {displayGoal} 點可兌換獎勵，還差 {Math.max(displayGoal - displayStamps, 0)} 點
           </p>
         </div>
         <span className="shrink-0 rounded-full bg-accent px-3 py-1 text-sm font-bold text-accent-foreground tabular-nums">
-          {member.stamps}/{member.stampGoal}
+          {displayStamps}/{displayGoal}
         </span>
       </div>
 

@@ -61,6 +61,21 @@ export async function restPatch(table: string, filter: string, body: unknown): P
   if (!res.ok) throw new Error(`Supabase REST PATCH ${table} failed: ${res.status} ${await res.text()}`);
 }
 
+/** INSERT one or more rows via PostgREST, returning the inserted row(s). */
+export async function restInsert<T>(table: string, body: unknown): Promise<T[]> {
+  const { url, serviceRoleKey } = getConfig();
+  const res = await fetch(`${url}/rest/v1/${table}`, {
+    method: "POST",
+    headers: authHeaders(serviceRoleKey, {
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    }),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Supabase REST INSERT ${table} failed: ${res.status} ${await res.text()}`);
+  return (await res.json()) as T[];
+}
+
 /** Create an auth user via the Admin REST API (auth.admin.createUser equivalent) */
 export async function adminCreateUser(input: {
   email: string;

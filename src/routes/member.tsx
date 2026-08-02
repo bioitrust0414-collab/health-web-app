@@ -5,9 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { LineOaCard } from "@/components/LineOaCard";
 import { MemberCard } from "@/components/MemberCard";
+import { StampCard } from "@/components/StampCard";
 
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
-import { setStoredProfileId } from "@/lib/memberSession";
+import { setStoredProfileId, setStoredSessionToken, getStoredSessionToken } from "@/lib/memberSession";
+import { getMemberDashboard, verifyLiffLogin, issueDemoToken } from "@/lib/memberActions.server";
 
 
 // 還沒有 LIFF ID（等大華官方帳號那邊協調好 LINE Developers 權限、建好 LIFF app
@@ -58,20 +60,6 @@ const getMemberData = createServerFn({ method: "GET" })
     return { profile, reports };
   });
 
-// 把 LINE ID token 換成 profileId：伺服器端會呼叫 LINE 驗證這個 token 是真的、
-// 沒有過期、發給我們自己的 channel，而不是相信前端隨便傳一個 LINE user id 上來。
-const verifyLineLogin = createServerFn({ method: "POST" })
-  .validator((idToken: unknown) => {
-    if (typeof idToken !== "string" || idToken.length === 0) {
-      throw new Error("idToken is required");
-    }
-    return idToken;
-  })
-  .handler(async ({ data: idToken }) => {
-    const { upsertProfileForLineUser } = await import("@/lib/lineAuth.server");
-    return upsertProfileForLineUser(idToken);
-  });
-
 export const Route = createFileRoute("/member")({
   head: () => ({
     meta: [
@@ -84,6 +72,7 @@ export const Route = createFileRoute("/member")({
   }),
   validateSearch: (search: Record<string, unknown>) => ({
     profileId: typeof search["profileId"] === "string" ? search["profileId"] : undefined,
+    token: typeof search["token"] === "string" ? search["token"] : undefined,
   }),
   loaderDeps: ({ search }) => ({ profileId: search["profileId"] }),
   loader: ({ deps }) => getMemberData({ data: deps["profileId"] ?? DEMO_PROFILE_ID }),
@@ -99,36 +88,64 @@ const genderLabel: Record<string, string> = {
 
 function useLineProfileId(
   webProfileId: string | undefined,
-): { profileId: string; source: "demo" | "line" | "line_web"; error: string | null } {
+  webToken: string | undefined,
+): {
+  profileId: string;
+  sessionToken: string | null;
+  source: "demo" | "line" | "line_web";
+  error: string | null;
+} {
   const [state, setState] = useState<{
     profileId: string;
+    sessionToken: string | null;
     source: "demo" | "line" | "line_web";
     error: string | null;
   }>(
-    webProfileId
-      ? { profileId: webProfileId, source: "line_web", error: null }
-      : { profileId: DEMO_PROFILE_ID, source: "demo", error: null },
+    webProfileId && webToken
+      ? { profileId: webProfileId, sessionToken: webToken, source: "line_web", error: null }
+      : { profileId: DEMO_PROFILE_ID, sessionToken: getStoredSessionToken(), source: "demo", error: null },
   );
 
   useEffect(() => {
-    if (webProfileId) {
+    if (webProfileId && webToken) {
       // Real profile handed to us by the web LINE Login redirect — remember it
       // so a future visit (e.g. clicking the LINE icon again) skips straight
       // to the member area instead of the add-friend flow.
       setStoredProfileId(webProfileId);
+      setStoredSessionToken(webToken);
       return;
     }
-    if (!isLiffConfigured()) return; // stay on the demo profile
+
+    if (!isLiffConfigured()) {
+      // Demo profile: mint a real signed token so booking/dashboard calls work
+      // the same way they will once LIFF is configured.
+      let cancelled = false;
+      (async () => {
+        try {
+          const token = await issueDemoToken();
+          if (!cancelled) {
+            setStoredSessionToken(token);
+            setState((prev) => ({ ...prev, sessionToken: token }));
+          }
+        } catch {
+          // non-fatal — booking/dashboard sections will just stay empty
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }
 
     let cancelled = false;
     (async () => {
       try {
         await ensureLiffLogin();
         const idToken = getLiffIdToken();
-        const { profileId } = await verifyLineLogin({ data: idToken });
+        const { profileId, token } = await verifyLiffLogin({ data: idToken });
         if (!cancelled) {
           setStoredProfileId(profileId);
-          setState({ profileId, source: "line", error: null });
+          setStoredSessionToken(token);
+          setState({ profileId, sessionToken: token, source: "line", error: null });
         }
       } catch (error) {
         if (!cancelled) {
@@ -143,7 +160,7 @@ function useLineProfileId(
     return () => {
       cancelled = true;
     };
-  }, [webProfileId]);
+  }, [webProfileId, webToken]);
 
   return state;
 }
@@ -156,8 +173,13 @@ const loginSourceLabel: Record<"demo" | "line" | "line_web", string> = {
 
 function MemberPage() {
   const demoData = Route.useLoaderData();
-  const { profileId: webProfileId } = Route.useSearch();
-  const { profileId, source, error: liffError } = useLineProfileId(webProfileId);
+  const { profileId: webProfileId, token: webToken } = Route.useSearch();
+  const {
+    profileId,
+    sessionToken,
+    source,
+    error: liffError,
+  } = useLineProfileId(webProfileId, webToken);
 
   // Once LIFF or the web login hands us a real profileId, refetch with the
   // real data instead of the SSR-loaded demo data.
@@ -168,13 +190,19 @@ function MemberPage() {
     initialData: source === "demo" ? demoData : undefined,
   });
 
+  const { data: dashboard } = useQuery({
+    queryKey: ["member-dashboard", sessionToken],
+    queryFn: () => getMemberDashboard({ data: sessionToken as string }),
+    enabled: Boolean(sessionToken),
+  });
+
   const { profile, reports } = data ?? demoData;
 
   return (
     <AppShell title={profile.full_name ?? "會員資料"} subtitle={loginSourceLabel[source]}>
       <div className="grid gap-5 pb-8 lg:grid-cols-2">
         <div className="grid gap-5">
-          <MemberCard />
+          <MemberCard points={dashboard?.points} />
           <section className="surface-card p-5 md:p-8">
             <h2 className="text-base font-bold">會員資料</h2>
             <p className="mt-1 text-xs text-muted-foreground">{profile.email ?? "—"}</p>
@@ -187,10 +215,51 @@ function MemberPage() {
               <Field label="地址" value={profile.address} className="col-span-2" />
             </div>
           </section>
+          <StampCard stamps={dashboard?.stamps} stampGoal={dashboard?.stampGoal} />
           <LineOaCard />
         </div>
 
         <div className="grid gap-5">
+          <section className="surface-card overflow-hidden">
+            <h2 className="px-5 pt-5 text-base font-bold md:px-8">我的預約</h2>
+            <div className="mt-2 divide-y divide-border">
+              {(!dashboard || dashboard.bookings.length === 0) && (
+                <p className="px-5 py-4 text-sm text-muted-foreground md:px-8">目前沒有預約紀錄。</p>
+              )}
+              {dashboard?.bookings.map((booking) => (
+                <div key={booking.id} className="flex items-center justify-between gap-3 px-5 py-3 md:px-8">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{booking.package_name}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {new Date(booking.created_at).toLocaleDateString("zh-TW")}
+                    </p>
+                  </div>
+                  <BookingStatusBadge status={booking.status} />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="surface-card overflow-hidden">
+            <h2 className="px-5 pt-5 text-base font-bold md:px-8">我的訂單</h2>
+            <div className="mt-2 divide-y divide-border">
+              {(!dashboard || dashboard.orders.length === 0) && (
+                <p className="px-5 py-4 text-sm text-muted-foreground md:px-8">目前沒有訂單紀錄。</p>
+              )}
+              {dashboard?.orders.map((order) => (
+                <div key={order.id} className="flex items-center justify-between gap-3 px-5 py-3 md:px-8">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{order.order_no}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      NT$ {order.final_amount.toLocaleString()} ・獲得 {order.points_earned} 點
+                    </p>
+                  </div>
+                  <OrderStatusBadge status={order.status} />
+                </div>
+              ))}
+            </div>
+          </section>
+
           <section className="surface-card overflow-hidden">
             <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 pt-5 md:px-8">
               <h2 className="min-w-0 truncate text-base font-bold">檢驗報告</h2>
@@ -242,6 +311,39 @@ function MemberPage() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+const bookingStatusLabel: Record<string, string> = {
+  pending: "待確認",
+  confirmed: "已確認",
+  completed: "已完成",
+  cancelled: "已取消",
+};
+
+function BookingStatusBadge({ status }: { status: string }) {
+  return (
+    <span className="shrink-0 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+      {bookingStatusLabel[status] ?? status}
+    </span>
+  );
+}
+
+const orderStatusLabel: Record<string, string> = {
+  pending: "待付款",
+  paid: "已付款",
+  processing: "處理中",
+  shipped: "已出貨",
+  completed: "已完成",
+  cancelled: "已取消",
+  refunded: "已退款",
+};
+
+function OrderStatusBadge({ status }: { status: string }) {
+  return (
+    <span className="shrink-0 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+      {orderStatusLabel[status] ?? status}
+    </span>
   );
 }
 
