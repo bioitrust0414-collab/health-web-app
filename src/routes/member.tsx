@@ -172,6 +172,7 @@ function MemberPage() {
     <AppShell title={profile.full_name ?? "會員資料"} subtitle={loginSourceLabel[source]}>
       <div className="grid gap-5 pb-8 lg:grid-cols-2">
         <div className="grid gap-5">
+          <MemberCard />
           <section className="surface-card p-5 md:p-8">
             <h2 className="text-base font-bold">會員資料</h2>
             <p className="mt-1 text-xs text-muted-foreground">{profile.email ?? "—"}</p>
@@ -184,11 +185,18 @@ function MemberPage() {
               <Field label="地址" value={profile.address} className="col-span-2" />
             </div>
           </section>
+          <LineOaCard />
         </div>
 
         <div className="grid gap-5">
           <section className="surface-card overflow-hidden">
-            <h2 className="px-5 pt-5 text-base font-bold md:px-8">檢驗報告</h2>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 pt-5 md:px-8">
+              <h2 className="min-w-0 truncate text-base font-bold">檢驗報告</h2>
+              <Link to="/reports" className="shrink-0 text-xs font-bold text-primary">
+                查看趨勢圖
+              </Link>
+            </div>
+
             <div className="mt-2 divide-y divide-border">
               {reports.length === 0 && (
                 <p className="px-5 py-4 text-sm text-muted-foreground md:px-8">
