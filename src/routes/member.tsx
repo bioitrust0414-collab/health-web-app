@@ -4,6 +4,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { LineOaCard } from "@/components/LineOaCard";
+import { MemberCard } from "@/components/MemberCard";
+
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
 import { setStoredProfileId } from "@/lib/memberSession";
 
