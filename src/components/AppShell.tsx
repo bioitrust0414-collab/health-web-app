@@ -47,7 +47,7 @@ export function AppShell({
                   to={item.to}
                   className="rounded-full px-4 py-2 text-sm font-medium opacity-80 transition hover:bg-primary-foreground/15 hover:opacity-100"
                   activeProps={{ className: "bg-primary-foreground/20 opacity-100" }}
-                  activeOptions={{ exact: item.to === "/" }}
+                  activeOptions={{ exact: false }}
                 >
                   {item.label}
                 </Link>
@@ -72,7 +72,7 @@ export function AppShell({
               to={item.to}
               className="flex flex-col items-center gap-1 py-3 text-xs font-medium text-muted-foreground transition"
               activeProps={{ className: "text-primary" }}
-              activeOptions={{ exact: item.to === "/" }}
+              activeOptions={{ exact: false }}
             >
               <item.icon className="h-5 w-5" />
               {item.label}
