@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
+import { LineOaCard } from "@/components/LineOaCard";
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
 import { setStoredProfileId } from "@/lib/memberSession";
+
 
 // 還沒有 LIFF ID（等大華官方帳號那邊協調好 LINE Developers 權限、建好 LIFF app
 // 之後才會有）時，先用固定的測試 profile id 示範「會員資料 + 報告查詢」怎麼串起來。

@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HealthRouteImport } from './routes/health'
 import { Route as MemberRouteImport } from './routes/member'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as TestsRouteImport } from './routes/tests'
 import { Route as AuthLineCallbackRouteImport } from './routes/auth.line.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MemberRoute = MemberRouteImport.update({
@@ -35,6 +42,11 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestsRoute = TestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
   id: '/auth/line/callback',
   path: '/auth/line/callback',
@@ -43,40 +55,69 @@ const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/shop': typeof ShopRoute
+  '/tests': typeof TestsRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/shop': typeof ShopRoute
+  '/tests': typeof TestsRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
   '/shop': typeof ShopRoute
+  '/tests': typeof TestsRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/member' | '/reports' | '/shop' | '/auth/line/callback'
+  fullPaths:
+    | '/'
+    | '/health'
+    | '/member'
+    | '/reports'
+    | '/shop'
+    | '/tests'
+    | '/auth/line/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/member' | '/reports' | '/shop' | '/auth/line/callback'
+  to:
+    | '/'
+    | '/health'
+    | '/member'
+    | '/reports'
+    | '/shop'
+    | '/tests'
+    | '/auth/line/callback'
   id:
-    '__root__' | '/' | '/member' | '/reports' | '/shop' | '/auth/line/callback'
+    | '__root__'
+    | '/'
+    | '/health'
+    | '/member'
+    | '/reports'
+    | '/shop'
+    | '/tests'
+    | '/auth/line/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HealthRoute: typeof HealthRoute
   MemberRoute: typeof MemberRoute
   ReportsRoute: typeof ReportsRoute
   ShopRoute: typeof ShopRoute
+  TestsRoute: typeof TestsRoute
   AuthLineCallbackRoute: typeof AuthLineCallbackRoute
 }
 
@@ -87,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/member': {
@@ -110,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tests': {
+      id: '/tests'
+      path: '/tests'
+      fullPath: '/tests'
+      preLoaderRoute: typeof TestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/line/callback': {
       id: '/auth/line/callback'
       path: '/auth/line/callback'
@@ -122,9 +177,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HealthRoute: HealthRoute,
   MemberRoute: MemberRoute,
   ReportsRoute: ReportsRoute,
   ShopRoute: ShopRoute,
+  TestsRoute: TestsRoute,
   AuthLineCallbackRoute: AuthLineCallbackRoute,
 }
 export const routeTree = rootRouteImport
