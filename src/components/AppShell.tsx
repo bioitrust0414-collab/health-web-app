@@ -1,14 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Activity, CreditCard, FileHeart, ShoppingBag } from "lucide-react";
+import { Activity, CreditCard, FlaskConical, ShoppingBag } from "lucide-react";
 import { useLiffEnvironment } from "@/lib/use-liff";
 
 const navItems = [
-  { to: "/", label: "健康首頁", icon: Activity },
-  { to: "/reports", label: "健檢報告", icon: FileHeart },
+  { to: "/health", label: "健康首頁", icon: Activity },
+  { to: "/tests", label: "檢驗套組", icon: FlaskConical },
   { to: "/shop", label: "健康商城", icon: ShoppingBag },
   { to: "/member", label: "會員卡", icon: CreditCard },
 ] as const;
+
 
 export function AppShell({
   title,
@@ -46,7 +47,7 @@ export function AppShell({
                   to={item.to}
                   className="rounded-full px-4 py-2 text-sm font-medium opacity-80 transition hover:bg-primary-foreground/15 hover:opacity-100"
                   activeProps={{ className: "bg-primary-foreground/20 opacity-100" }}
-                  activeOptions={{ exact: item.to === "/" }}
+                  activeOptions={{ exact: false }}
                 >
                   {item.label}
                 </Link>
@@ -71,7 +72,7 @@ export function AppShell({
               to={item.to}
               className="flex flex-col items-center gap-1 py-3 text-xs font-medium text-muted-foreground transition"
               activeProps={{ className: "text-primary" }}
-              activeOptions={{ exact: item.to === "/" }}
+              activeOptions={{ exact: false }}
             >
               <item.icon className="h-5 w-5" />
               {item.label}
