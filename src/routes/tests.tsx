@@ -5,6 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { LineOaCard } from "@/components/LineOaCard";
 import { packages, geneTests, type Package } from "@/data/dahua";
 import { LINE_OA_ADD_FRIEND_URL } from "@/lib/line-oa";
+import { useSessionToken } from "@/lib/useSessionToken";
+import { createBooking } from "@/lib/memberActions.server";
 
 export const Route = createFileRoute("/tests")({
   head: () => ({
@@ -92,7 +94,7 @@ function TestsPage() {
                     最完整方案
                   </span>
                 )}
-                <BookButton />
+                <BookButton packageName={g.name} bookingType="gene_test" />
               </div>
             ))}
           </div>
@@ -104,7 +106,7 @@ function TestsPage() {
               <div key={a.name} className="surface-card p-4">
                 <p className="text-sm font-bold">{a.name}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{a.desc}</p>
-                <BookButton />
+                <BookButton packageName={a.name} bookingType="allergy_test" />
               </div>
             ))}
           </div>
@@ -149,20 +151,61 @@ function PackageCard({ pkg }: { pkg: Package }) {
         </ul>
       )}
 
-      <BookButton />
+      <BookButton packageName={pkg.name} bookingType="checkup" />
     </div>
   );
 }
 
-function BookButton() {
+function BookButton({
+  packageName,
+  bookingType,
+}: {
+  packageName: string;
+  bookingType: "checkup" | "gene_test" | "allergy_test";
+}) {
+  const { getSessionToken } = useSessionToken();
+  const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
+
+  async function handleClick() {
+    setState("loading");
+    try {
+      const sessionToken = await getSessionToken();
+      await createBooking({ data: { sessionToken, bookingType, packageName } });
+      setState("done");
+    } catch {
+      setState("error");
+    }
+  }
+
+  if (state === "done") {
+    return (
+      <div className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-3 text-sm font-bold text-muted-foreground">
+        <Check className="h-4 w-4" /> 已加入預約，會員專區可查看
+      </div>
+    );
+  }
+
   return (
-    <a
-      href={LINE_OA_ADD_FRIEND_URL}
-      target="_blank"
-      rel="noreferrer"
-      className="mt-4 flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition active:scale-[0.99]"
-    >
-      LINE 線上預約
-    </a>
+    <div className="mt-4 grid gap-2">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={state === "loading"}
+        className="flex w-full items-center justify-center rounded-2xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground transition active:scale-[0.99] disabled:opacity-60"
+      >
+        {state === "loading" ? "送出中..." : "線上預約"}
+      </button>
+      {state === "error" && (
+        <p className="text-center text-xs text-destructive">預約失敗，請改用 LINE 聯繫我們。</p>
+      )}
+      <a
+        href={LINE_OA_ADD_FRIEND_URL}
+        target="_blank"
+        rel="noreferrer"
+        className="text-center text-xs font-medium text-muted-foreground underline underline-offset-2"
+      >
+        或透過 LINE 官方帳號聯繫
+      </a>
+    </div>
   );
 }

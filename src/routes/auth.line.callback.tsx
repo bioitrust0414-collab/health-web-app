@@ -16,11 +16,13 @@ const handleLineCallback = createServerFn({ method: "GET" })
       throw new Error(data["error"] ?? "Missing authorization code from LINE.");
     }
     const { exchangeCodeForProfile } = await import("@/lib/lineAuth.server");
+    const { issueSessionToken } = await import("@/lib/sessionToken");
     const { profileId } = await exchangeCodeForProfile(
       data["code"],
       `${process.env["PUBLIC_SITE_URL"] ?? "https://dahua-health-app.vercel.app"}/auth/line/callback`,
     );
-    return { profileId };
+    const token = await issueSessionToken(profileId);
+    return { profileId, token };
   });
 
 export const Route = createFileRoute("/auth/line/callback")({
@@ -30,8 +32,8 @@ export const Route = createFileRoute("/auth/line/callback")({
   }),
   loaderDeps: ({ search }) => ({ code: search.code, error: search.error }),
   loader: async ({ deps }) => {
-    const { profileId } = await handleLineCallback({ data: deps });
-    throw redirect({ to: "/member", search: { profileId } });
+    const { profileId, token } = await handleLineCallback({ data: deps });
+    throw redirect({ to: "/member", search: { profileId, token } });
   },
   component: () => null,
 });

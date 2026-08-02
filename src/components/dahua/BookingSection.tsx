@@ -2,6 +2,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { bookingOptions } from "@/data/dahua";
 import { getStoredProfileId } from "@/lib/memberSession";
+import { useSessionToken } from "@/lib/useSessionToken";
+import { createBooking } from "@/lib/memberActions.server";
 import { SectionHeader } from "./SectionHeader";
 
 const contacts = [
@@ -32,6 +34,7 @@ const contacts = [
 ];
 
 export function BookingSection() {
+  const { getSessionToken } = useSessionToken();
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,18 +50,36 @@ export function BookingSection() {
     setLoading(true);
     setError(null);
 
-    const msg = `【大華醫事檢驗所預約諮詢】\n姓名：${form.name}\n電話：${form.phone}\n諮詢套組：${form.pkg}\n備註：${form.note}`;
-    window.open(
-      `https://line.me/R/oaMessage/@932cczax/?text=${encodeURIComponent(msg)}`,
-      "_blank",
-    );
+    try {
+      // 登入（LIFF 或 demo）後才能真正寫入預約紀錄，未登入時 getSessionToken()
+      // 在 LIFF 環境下會直接跳轉到 LINE 登入頁。
+      const sessionToken = await getSessionToken();
+      await createBooking({
+        data: {
+          sessionToken,
+          bookingType: "consultation",
+          packageName: form.pkg,
+          contactName: form.name,
+          contactPhone: form.phone,
+          notes: form.note,
+        },
+      });
+      setIsMember(true);
 
-    setSent(true);
-    setLoading(false);
-    window.setTimeout(() => {
-      setSent(false);
-      setForm({ name: "", phone: "", pkg: "", note: "" });
-    }, 4000);
+      // 同時用 LINE 訊息通知門市，方便人工立即跟進。
+      const msg = `【大華醫事檢驗所預約諮詢】\n姓名：${form.name}\n電話：${form.phone}\n諮詢套組：${form.pkg}\n備註：${form.note}`;
+      window.open(`https://line.me/R/oaMessage/@932cczax/?text=${encodeURIComponent(msg)}`, "_blank");
+
+      setSent(true);
+      window.setTimeout(() => {
+        setSent(false);
+        setForm({ name: "", phone: "", pkg: "", note: "" });
+      }, 4000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "預約送出失敗，請稍後再試。");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -79,7 +100,7 @@ export function BookingSection() {
                   <div className="contact-icon">{c.icon}</div>
                   <div className="contact-title">{c.title}</div>
                   <div className="contact-info">{c.info}</div>
-                  <Link to="/member" search={{ profileId: undefined }} className="contact-link">
+                  <Link to="/member" search={{ profileId: undefined, token: undefined }} className="contact-link">
                     前往會員專區 →
                   </Link>
                 </div>
@@ -104,7 +125,9 @@ export function BookingSection() {
         </div>
         <div className="booking-form-container">
           <h3 className="form-title">預約專業諮詢</h3>
-          <p className="form-desc">填寫以下資料，我們將於工作日 24 小時內與您聯繫確認。</p>
+          <p className="form-desc">
+            填寫以下資料並送出，預約會直接記錄在您的會員專區，我們也會於工作日 24 小時內與您聯繫確認。
+          </p>
           {error && (
             <p style={{ color: "#f87171", textAlign: "center", marginBottom: "16px", fontSize: "14px" }}>
               {error}
@@ -153,14 +176,14 @@ export function BookingSection() {
                 required
               />
               <button type="submit" className="form-submit" disabled={loading}>
-                {loading ? "送出中..." : "💬 透過 LINE 送出預約"}
+                {loading ? "送出中..." : "送出預約"}
               </button>
             </form>
           ) : (
             <div className="form-success">
               <div className="success-icon">✓</div>
               <div className="success-title">預約資料已成功送出</div>
-              <div className="success-desc">我們將盡快與您聯繫，感謝您的信任。</div>
+              <div className="success-desc">已記錄在您的會員專區，我們將盡快與您聯繫，感謝您的信任。</div>
             </div>
           )}
         </div>
