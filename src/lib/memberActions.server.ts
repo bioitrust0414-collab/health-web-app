@@ -10,10 +10,6 @@
 
 import { createServerFn } from "@tanstack/react-start";
 
-// 固定的測試 profile id：LIFF 還沒設定時（或本機開發時），讓預約/商城/會員
-// 儀表板都能示範真實的資料流程，而不是完全沒東西可看。
-const DEMO_PROFILE_ID = "30a85010-9893-4811-8bfc-f7e5d48a3401";
-
 const STAMP_GOAL = 10;
 const POINTS_PER_BOOKING = 50;
 const POINTS_PER_100_SPENT = 1; // 1 point per NT$100 spent (after point redemption), rounded down
@@ -66,13 +62,6 @@ export const verifyLiffLogin = createServerFn({ method: "POST" })
     const token = await issueSessionToken(profile.profileId);
     return { ...profile, token };
   });
-
-// Demo 模式（LIFF 還沒設定時）也要能示範預約/商城/會員儀表板，所以幫固定的
-// 測試 profile 也發一組正常的簽章 token，用法跟真的登入完全一樣。
-export const issueDemoToken = createServerFn({ method: "GET" }).handler(async () => {
-  const { issueSessionToken } = await import("./sessionToken");
-  return issueSessionToken(DEMO_PROFILE_ID);
-});
 
 // ------------------------------------------------------------------
 // 預約

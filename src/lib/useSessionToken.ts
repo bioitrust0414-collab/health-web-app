@@ -8,23 +8,21 @@
 import { useCallback } from "react";
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "./liffClient";
 import { getStoredSessionToken, setStoredProfileId, setStoredSessionToken } from "./memberSession";
-import { verifyLiffLogin, issueDemoToken } from "./memberActions.server";
+import { verifyLiffLogin } from "./memberActions.server";
 
 export function useSessionToken() {
   const getSessionToken = useCallback(async (): Promise<string> => {
     const existing = getStoredSessionToken();
     if (existing) return existing;
 
-    if (isLiffConfigured()) {
-      await ensureLiffLogin(); // may redirect to LINE and never resolve on first visit
-      const idToken = getLiffIdToken();
-      const { profileId, token } = await verifyLiffLogin({ data: idToken });
-      setStoredProfileId(profileId);
-      setStoredSessionToken(token);
-      return token;
+    if (!isLiffConfigured()) {
+      throw new Error("LINE 登入尚未設定完成，請聯繫網站管理員。");
     }
 
-    const token = await issueDemoToken();
+    await ensureLiffLogin(); // may redirect to LINE and never resolve on first visit
+    const idToken = getLiffIdToken();
+    const { profileId, token } = await verifyLiffLogin({ data: idToken });
+    setStoredProfileId(profileId);
     setStoredSessionToken(token);
     return token;
   }, []);

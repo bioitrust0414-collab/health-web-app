@@ -9,13 +9,7 @@ import { StampCard } from "@/components/StampCard";
 
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
 import { setStoredProfileId, setStoredSessionToken, getStoredSessionToken } from "@/lib/memberSession";
-import { getMemberDashboard, verifyLiffLogin, issueDemoToken } from "@/lib/memberActions.server";
-
-
-// 還沒有 LIFF ID（等大華官方帳號那邊協調好 LINE Developers 權限、建好 LIFF app
-// 之後才會有）時，先用固定的測試 profile id 示範「會員資料 + 報告查詢」怎麼串起來。
-// 一旦 VITE_LIFF_ID 設定了，畫面會自動改用真實的 LINE 登入使用者。
-const DEMO_PROFILE_ID = "30a85010-9893-4811-8bfc-f7e5d48a3401";
+import { getMemberDashboard, verifyLiffLogin } from "@/lib/memberActions.server";
 
 interface ProfileRow {
   id: string;
@@ -74,8 +68,6 @@ export const Route = createFileRoute("/member")({
     profileId: typeof search["profileId"] === "string" ? search["profileId"] : undefined,
     token: typeof search["token"] === "string" ? search["token"] : undefined,
   }),
-  loaderDeps: ({ search }) => ({ profileId: search["profileId"] }),
-  loader: ({ deps }) => getMemberData({ data: deps["profileId"] ?? DEMO_PROFILE_ID }),
   component: MemberPage,
 });
 
@@ -86,73 +78,56 @@ const genderLabel: Record<string, string> = {
   prefer_not_to_say: "不願透露",
 };
 
-function useLineProfileId(
-  webProfileId: string | undefined,
-  webToken: string | undefined,
-): {
-  profileId: string;
-  sessionToken: string | null;
-  source: "demo" | "line" | "line_web";
-  error: string | null;
-} {
-  const [state, setState] = useState<{
-    profileId: string;
-    sessionToken: string | null;
-    source: "demo" | "line" | "line_web";
-    error: string | null;
-  }>(
-    webProfileId && webToken
-      ? { profileId: webProfileId, sessionToken: webToken, source: "line_web", error: null }
-      : { profileId: DEMO_PROFILE_ID, sessionToken: getStoredSessionToken(), source: "demo", error: null },
-  );
+type AuthState =
+  | { status: "checking" }
+  | { status: "signed_out"; error: string | null }
+  | { status: "signed_in"; profileId: string; sessionToken: string; source: "line" | "line_web" };
+
+/** No demo fallback: this only ever resolves to a real, LINE-verified profileId. */
+function useMemberAuth(webProfileId: string | undefined, webToken: string | undefined) {
+  const [state, setState] = useState<AuthState>(() => {
+    if (webProfileId && webToken) {
+      return { status: "signed_in", profileId: webProfileId, sessionToken: webToken, source: "line_web" };
+    }
+    const storedToken = getStoredSessionToken();
+    // We don't know the profileId from a bare stored token without asking the
+    // server, so on refresh we still re-run the LIFF check below rather than
+    // trusting local storage alone.
+    return storedToken ? { status: "checking" } : { status: "checking" };
+  });
 
   useEffect(() => {
     if (webProfileId && webToken) {
-      // Real profile handed to us by the web LINE Login redirect — remember it
-      // so a future visit (e.g. clicking the LINE icon again) skips straight
-      // to the member area instead of the add-friend flow.
       setStoredProfileId(webProfileId);
       setStoredSessionToken(webToken);
       return;
     }
 
     if (!isLiffConfigured()) {
-      // Demo profile: mint a real signed token so booking/dashboard calls work
-      // the same way they will once LIFF is configured.
-      let cancelled = false;
-      (async () => {
-        try {
-          const token = await issueDemoToken();
-          if (!cancelled) {
-            setStoredSessionToken(token);
-            setState((prev) => ({ ...prev, sessionToken: token }));
-          }
-        } catch {
-          // non-fatal — booking/dashboard sections will just stay empty
-        }
-      })();
-      return () => {
-        cancelled = true;
-      };
+      setState({
+        status: "signed_out",
+        error: "LINE 登入尚未設定完成，請聯繫網站管理員。",
+      });
+      return;
     }
 
     let cancelled = false;
     (async () => {
       try {
-        await ensureLiffLogin();
+        await ensureLiffLogin(); // redirects to LINE if not logged in; may never resolve on first visit
         const idToken = getLiffIdToken();
         const { profileId, token } = await verifyLiffLogin({ data: idToken });
         if (!cancelled) {
           setStoredProfileId(profileId);
           setStoredSessionToken(token);
-          setState({ profileId, sessionToken: token, source: "line", error: null });
+          setState({ status: "signed_in", profileId, sessionToken: token, source: "line" });
         }
       } catch (error) {
         if (!cancelled) {
-          setState((prev) => ({
-            ...prev,
-            error: error instanceof Error ? error.message : "LINE login failed",
-          }));
+          setState({
+            status: "signed_out",
+            error: error instanceof Error ? error.message : "LINE 登入失敗",
+          });
         }
       }
     })();
@@ -165,48 +140,74 @@ function useLineProfileId(
   return state;
 }
 
-const loginSourceLabel: Record<"demo" | "line" | "line_web", string> = {
+const loginSourceLabel: Record<"line" | "line_web", string> = {
   line: "已透過 LINE 登入（LIFF）",
   line_web: "已透過 LINE 登入（網頁）",
-  demo: "Demo 頁面（尚未設定 LIFF，顯示固定測試帳號）",
 };
 
 function MemberPage() {
-  const demoData = Route.useLoaderData();
   const { profileId: webProfileId, token: webToken } = Route.useSearch();
-  const {
-    profileId,
-    sessionToken,
-    source,
-    error: liffError,
-  } = useLineProfileId(webProfileId, webToken);
+  const auth = useMemberAuth(webProfileId, webToken);
 
-  // Once LIFF or the web login hands us a real profileId, refetch with the
-  // real data instead of the SSR-loaded demo data.
   const { data } = useQuery({
-    queryKey: ["member-data", profileId],
-    queryFn: () => getMemberData({ data: profileId }),
-    enabled: source !== "demo",
-    initialData: source === "demo" ? demoData : undefined,
+    queryKey: ["member-data", auth.status === "signed_in" ? auth.profileId : null],
+    queryFn: () => getMemberData({ data: (auth as Extract<AuthState, { status: "signed_in" }>).profileId }),
+    enabled: auth.status === "signed_in",
   });
 
   const { data: dashboard } = useQuery({
-    queryKey: ["member-dashboard", sessionToken],
-    queryFn: () => getMemberDashboard({ data: sessionToken as string }),
-    enabled: Boolean(sessionToken),
+    queryKey: ["member-dashboard", auth.status === "signed_in" ? auth.sessionToken : null],
+    queryFn: () =>
+      getMemberDashboard({ data: (auth as Extract<AuthState, { status: "signed_in" }>).sessionToken }),
+    enabled: auth.status === "signed_in",
   });
 
-  const { profile, reports } = data ?? demoData;
+  if (auth.status === "checking") {
+    return (
+      <AppShell title="會員專區" subtitle="正在確認登入狀態…">
+        <div className="surface-card p-8 text-center text-sm text-muted-foreground">載入中…</div>
+      </AppShell>
+    );
+  }
+
+  if (auth.status === "signed_out") {
+    return (
+      <AppShell title="會員專區" subtitle="請先透過 LINE 登入">
+        <div className="surface-card grid gap-4 p-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            會員資料、預約、訂單與健檢報告僅限已登入會員查看。
+          </p>
+          {auth.error && <p className="text-xs text-destructive">{auth.error}</p>}
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mx-auto rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+          >
+            使用 LINE 登入
+          </button>
+        </div>
+      </AppShell>
+    );
+  }
+
+  if (!data) {
+    return (
+      <AppShell title="會員專區" subtitle={loginSourceLabel[auth.source]}>
+        <div className="surface-card p-8 text-center text-sm text-muted-foreground">載入會員資料中…</div>
+      </AppShell>
+    );
+  }
+
+  const { profile, reports } = data;
 
   return (
-    <AppShell title={profile.full_name ?? "會員資料"} subtitle={loginSourceLabel[source]}>
+    <AppShell title={profile.full_name ?? "會員資料"} subtitle={loginSourceLabel[auth.source]}>
       <div className="grid gap-5 pb-8 lg:grid-cols-2">
         <div className="grid gap-5">
           <MemberCard points={dashboard?.points} />
           <section className="surface-card p-5 md:p-8">
             <h2 className="text-base font-bold">會員資料</h2>
             <p className="mt-1 text-xs text-muted-foreground">{profile.email ?? "—"}</p>
-            {liffError && <p className="mt-2 text-xs text-destructive">LINE 登入失敗：{liffError}</p>}
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <Field label="姓名" value={profile.full_name} />
               <Field label="電話" value={profile.phone} />
