@@ -1,14 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Activity, CreditCard, FileHeart, ShoppingBag } from "lucide-react";
+import { Activity, CreditCard, FlaskConical, ShoppingBag } from "lucide-react";
 import { useLiffEnvironment } from "@/lib/use-liff";
 
 const navItems = [
-  { to: "/", label: "健康首頁", icon: Activity },
-  { to: "/reports", label: "健檢報告", icon: FileHeart },
+  { to: "/health", label: "健康首頁", icon: Activity },
+  { to: "/tests", label: "檢驗套組", icon: FlaskConical },
   { to: "/shop", label: "健康商城", icon: ShoppingBag },
   { to: "/member", label: "會員卡", icon: CreditCard },
 ] as const;
+
 
 export function AppShell({
   title,
