@@ -18,6 +18,12 @@ export const Route = createFileRoute('/bb-drink/')({
     return await fetchBBDrinkData()
   },
   component: BBDrinkPage,
+  errorComponent: ({ error }) => (
+    <div className="p-6 text-sm text-muted-foreground">
+      載入失敗：{error.message}
+    </div>
+  ),
+  notFoundComponent: () => <div className="p-6">找不到頁面</div>,
 })
 
 function BBDrinkPage() {

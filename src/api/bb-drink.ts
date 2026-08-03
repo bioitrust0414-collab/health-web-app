@@ -1,7 +1,7 @@
 // src/api/bb-drink.ts
 // Server Function 邊界：Client 端只會拿到 RPC stub，Supabase Admin 金鑰不會進 client bundle。
 import { createServerFn } from '@tanstack/react-start';
-import { restGetList, restGetOne } from '@/lib/supabaseAdmin';
+import { hasSupabaseAdminConfig, restGetList, restGetOne } from '@/lib/supabaseAdmin';
 import type { BBDrinkProduct } from '@/types/bb-drink';
 
 // DB 欄位是 snake_case（跟 products 表同慣例），PostgREST 不會自動轉成
