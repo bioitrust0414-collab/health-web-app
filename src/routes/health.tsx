@@ -1,16 +1,14 @@
-// src/routes/health.tsx
-import { createFileRoute } from '@tanstack/react-router';
-import { getHealthReports } from '@/server/health';
+import { createFileRoute } from '@tanstack/react-router'
+import { fetchHealthData } from 'src/api/health'
 
 export const Route = createFileRoute('/health')({
-  component: HealthPage,
   loader: async () => {
-    const data = await getHealthReports();
-    return data;
+    return await fetchHealthData()
   },
-});
+  component: HealthPage,
+})
 
 function HealthPage() {
-  const { reports, dailyLogs } = Route.useLoaderData();
-  // ... 渲染邏輯
+  const data = Route.useLoaderData()
+  return <div>{JSON.stringify(data)}</div>
 }
