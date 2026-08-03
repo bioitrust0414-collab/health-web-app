@@ -27,18 +27,7 @@ export const Route = createFileRoute('/bb-drink/')({
 })
 
 function BBDrinkPage() {
-  const { products, configured } = Route.useLoaderData()
-
-  if (!configured) {
-    return (
-      <div className="min-h-screen bg-white p-6">
-        <h1 className="text-xl font-bold">bioid × 好家庭</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          資料庫尚未設定（缺少伺服器金鑰），目前沒有商品可顯示。
-        </p>
-      </div>
-    )
-  }
+  const { products } = Route.useLoaderData()
 
   return (
     <div className="min-h-screen bg-white">
