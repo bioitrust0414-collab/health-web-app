@@ -1,3 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { fetchBBDrinkData } from 'src/server/bb-drink'
 
 export const Route = createFileRoute('/bb-drink/')({
@@ -8,3 +9,12 @@ export const Route = createFileRoute('/bb-drink/')({
   },
   component: BBDrinkPage,
 })
+
+function BBDrinkPage() {
+  const data = Route.useLoaderData()
+
+  return (
+    <div>
+      <h1>BB Drink</h1>
+      {/* 根據你的實際資料結構調整渲染 */}
+      <pre>{JSON.stringify(data, null, 
