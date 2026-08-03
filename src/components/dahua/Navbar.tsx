@@ -19,8 +19,8 @@ export function Navbar() {
     { href: "/education", label: "衛教知識" },
     // ❌ mal1688 已移除
     // ❌ 寵物零嘴已移除
-    // ✅ 新增：BB 神采速纖飲
-    { href: "/bb-drink", label: "BB 神采速纖飲" },
+    // ✅ 新增：健康好夥伴（商城，原 BB 神采速纖飲連結）
+    { href: "/bb-drink", label: "健康好夥伴" },
     // ✅ 新增：健康 App
     { href: "/health", label: "健康 App" },
     // ✅ 動態：未登入顯示「會員登入」，已登入顯示「會員中心」

@@ -77,8 +77,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "綠豆咖啡會員卡" },
-      { name: "description", content: "綠豆咖啡 LINE 會員集點卡，累積點數兌換好禮。" },
+      { title: "健康好夥伴" },
+      { name: "description", content: "健康好夥伴 LINE 會員集點卡，累積點數兌換好禮。" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

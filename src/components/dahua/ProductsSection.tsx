@@ -2,16 +2,16 @@ import { SectionHeader } from "./SectionHeader";
 
 const products = [
   {
-    icon: "🦴",
-    name: "專業家庭發育與複合鈣系統",
-    desc: "以臨床骨代謝數據為基準，引進大西洋無污染天然紅藻海藻鈣，融合多元優質複合鈣源 × 關鍵導航因子 D3+K2。確保每一份營養都能精準引導鈣質沉積，全方位支援兒童發育與全家人骨骼健康。",
+    icon: "🌿",
+    name: "健康好夥伴",
+    desc: "bioid × 好家庭嚴選保健系列——BB神采速纖飲、DHA魚油、晶亮納豆Q10，搭配好家庭成長鈣、活力代謝、夜酵素複方、蔓越莓益生菌，一站式滿足全家日常保養需求。",
     features: [
-      "天然紅藻海藻鈣高吸收配方",
-      "水果風味優良依從性咀嚼錠",
-      "兒童發育與長輩骨骼強力支持",
+      "衛部健食字認證，安心有保障",
+      "全家適用：兒童成長到日常保健一次滿足",
+      "線上直接選購，會員點數同步累積",
     ],
-    link: "/mal1688",
-    cta: "查看科學實證與完整系列 ➔",
+    link: "/bb-drink",
+    cta: "查看完整商城 ➔",
   },
 ];
 
@@ -21,7 +21,7 @@ export function ProductsSection() {
       <div className="container">
         <SectionHeader
           badge="Health Products"
-          title="健康保健產品"
+          title="健康好夥伴"
           desc="精選高品質的營養補充產品，為您與全家的健康加分。"
         />
         <div className="products-grid">
