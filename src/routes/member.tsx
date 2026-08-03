@@ -49,7 +49,22 @@ const getMemberData = createServerFn({ method: "GET" })
     return profileId;
   })
   .handler(async ({ data: profileId }) => {
-    const { restGetOne, restGetList } = await import("@/lib/supabaseAdmin");
+    const { hasSupabaseAdminConfig, restGetOne, restGetList } = await import("@/lib/supabaseAdmin");
+
+    if (!hasSupabaseAdminConfig()) {
+      return {
+        profile: {
+          id: profileId,
+          email: "demo@kanlife.tw",
+          full_name: "陳小綠",
+          phone: "0912-345-678",
+          birthday: "1990-05-18",
+          gender: "female" as const,
+          address: "彰化市",
+        },
+        reports: [] as ReportRow[],
+      };
+    }
 
     const [profile, reports] = await Promise.all([
       restGetOne<ProfileRow>("profiles", `id=eq.${profileId}`),
@@ -78,6 +93,14 @@ export const Route = createFileRoute("/member")({
   loaderDeps: ({ search }) => ({ profileId: search["profileId"] }),
   loader: ({ deps }) => getMemberData({ data: deps["profileId"] ?? DEMO_PROFILE_ID }),
   component: MemberPage,
+  errorComponent: () => (
+    <AppShell title="會員中心" subtitle="會員資料暫時無法同步">
+      <div className="surface-card p-5 text-sm text-muted-foreground">
+        請稍後再試；會員卡與點數功能仍可在服務恢復後使用。
+      </div>
+    </AppShell>
+  ),
+  notFoundComponent: () => <div className="p-6">找不到會員資料</div>,
 });
 
 const genderLabel: Record<string, string> = {
