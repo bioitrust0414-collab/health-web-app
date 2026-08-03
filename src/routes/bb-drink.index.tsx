@@ -11,5 +11,11 @@ export const Route = createFileRoute('/bb-drink/')({
 
 function BBDrinkPage() {
   const data = Route.useLoaderData()
-  return <div>{JSON.stringify(data)}</div>
+
+  return (
+    <div>
+      <h1>BB Drink</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  )
 }
