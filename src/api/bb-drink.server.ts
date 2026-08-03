@@ -36,7 +36,22 @@ function getPublicConfig() {
 }
 
 function mapRow(row: BBDrinkProductRow): BBDrinkProduct {
-  return { id: row.id, name: row.name, subtitle: row.subtitle ?? '', price: row.price, originalPrice: row.original_price ?? undefined, image: row.image ?? '', description: row.description ?? '', ingredients: row.ingredients ?? [], benefits: row.benefits ?? [], flavor: row.flavor ?? '', netWeight: row.net_weight ?? '', stock: row.stock, isNew: row.is_new, isBestSeller: row.is_best_seller }
+  return {
+    id: row.id,
+    name: row.name,
+    subtitle: row.subtitle ?? '',
+    price: row.price,
+    ...(row.original_price === null ? {} : { originalPrice: row.original_price }),
+    image: row.image ?? '',
+    description: row.description ?? '',
+    ingredients: row.ingredients ?? [],
+    benefits: row.benefits ?? [],
+    flavor: row.flavor ?? '',
+    netWeight: row.net_weight ?? '',
+    stock: row.stock,
+    isNew: row.is_new,
+    isBestSeller: row.is_best_seller,
+  }
 }
 
 async function publicGetList<T>(query: string): Promise<T[]> {
