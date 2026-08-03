@@ -11,15 +11,16 @@ export const getHealthReports = createServerFn({ method: 'GET' })
     if (!userId) throw new Error('Unauthorized');
 
     const [reports, dailyLogs] = await Promise.all([
-      restGetList<Record<string, unknown>>(
+      restGetList<Record<string, string | number | boolean | null>>(
         'reports',
         `user_id=eq.${encodeURIComponent(userId)}&select=*&order=created_at.desc`,
       ),
-      restGetList<Record<string, unknown>>(
+      restGetList<Record<string, string | number | boolean | null>>(
         'daily_logs',
         `user_id=eq.${encodeURIComponent(userId)}&select=*&order=date.desc&limit=30`,
       ),
     ]);
+
 
     return { reports, dailyLogs };
   });
