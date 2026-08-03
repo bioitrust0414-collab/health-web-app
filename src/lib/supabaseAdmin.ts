@@ -8,6 +8,11 @@
 // internal decode logic was misfiring, and are just as correct: Supabase's
 // REST APIs are the same APIs the JS client calls under the hood.
 
+/** True when the server environment has Supabase admin credentials. */
+export function hasSupabaseAdminConfig(): boolean {
+  return Boolean(process.env["SUPABASE_URL"] && process.env["SUPABASE_SERVICE_ROLE_KEY"]);
+}
+
 function getConfig() {
   const url = process.env["SUPABASE_URL"];
   const serviceRoleKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
