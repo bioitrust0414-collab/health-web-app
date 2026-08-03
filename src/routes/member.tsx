@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { LineOaCard } from "@/components/LineOaCard";
 import { MemberCard } from "@/components/MemberCard";
 import { StampCard } from "@/components/StampCard";
+import { Activity } from "lucide-react";
 
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
 import { setStoredProfileId, setStoredSessionToken, getStoredSessionToken } from "@/lib/memberSession";
@@ -203,6 +204,18 @@ function MemberPage() {
       <div className="grid gap-5 pb-8 lg:grid-cols-2">
         <div className="grid gap-5">
           <MemberCard points={dashboard?.points} />
+          <Link
+            to="/health"
+            className="flex items-center justify-between rounded-2xl bg-primary p-5 text-primary-foreground shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <div>
+              <p className="text-lg font-bold">查看健康儀表板</p>
+              <p className="text-sm opacity-90">瀏覽步數、睡眠與各項健康指標</p>
+            </div>
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-white/20">
+              <Activity className="h-6 w-6" />
+            </div>
+          </Link>
           <section className="surface-card p-5 md:p-8">
             <h2 className="text-base font-bold">會員資料</h2>
             <p className="mt-1 text-xs text-muted-foreground">{profile.email ?? "—"}</p>

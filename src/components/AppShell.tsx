@@ -7,7 +7,7 @@ const navItems = [
   { to: "/health", label: "健康首頁", icon: Activity },
   { to: "/tests", label: "檢驗套組", icon: FlaskConical },
   { to: "/shop", label: "健康商城", icon: ShoppingBag },
-  { to: "/member", label: "會員卡", icon: CreditCard },
+  { to: "/member", label: "會員中心", icon: CreditCard },
 ] as const;
 
 

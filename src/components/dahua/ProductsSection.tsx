@@ -13,14 +13,6 @@ const products = [
     link: "/mal1688",
     cta: "查看科學實證與完整系列 ➔",
   },
-  {
-    icon: "🐾",
-    name: "Paludo & Mila 天然手作寵物零嘴",
-    desc: "在地天然、純粹手作。使用 100% 低溫烘焙鮮純雞胸肉（頂級雞肉薄片），無任何化學添加物或人工防腐劑。以溫暖工藝封存天然蛋白營養，守護家中毛孩的每一口純粹滋味。",
-    features: ["100% 國產新鮮雞胸肉製作", "無鹽無添加、低溫烘焙熟化", "口腔清潔、挑嘴毛孩健康零嘴"],
-    link: "heychew1688/index.html",
-    cta: "查看毛孩手工零嘴目錄 ➔",
-  },
 ];
 
 export function ProductsSection() {
@@ -30,7 +22,7 @@ export function ProductsSection() {
         <SectionHeader
           badge="Health Products"
           title="健康保健產品"
-          desc="精選高品質的營養補充與寵物手作食品，為您與全家（包含毛孩）的健康加分。"
+          desc="精選高品質的營養補充產品，為您與全家的健康加分。"
         />
         <div className="products-grid">
           {products.map((p) => (

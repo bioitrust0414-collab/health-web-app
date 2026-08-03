@@ -7,9 +7,8 @@ const links = [
   { href: "#products", label: "保健產品" },
   { href: "/education", label: "衛教知識" },
   { href: "/mal1688", label: "專業複合鈣" },
-  { href: "/heychew1688/index.html", label: "寵物零嘴" },
-  { href: "/health", label: "健康 App" },
-  { href: "/member", label: "會員登入" },
+
+  { href: "/member", label: "會員中心" },
 
 ];
 
