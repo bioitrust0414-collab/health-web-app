@@ -1,17 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { fetchBBDrinkData } from 'src/server/bb-drink'
+import { fetchBBDrinkData } from 'src/api/bb-drink'
 
 export const Route = createFileRoute('/bb-drink/')({
   loader: async () => {
-    const data = await fetchBBDrinkData()
-    return data
+    return await fetchBBDrinkData()
   },
   component: BBDrinkPage,
 })
 
 function BBDrinkPage() {
   const data = Route.useLoaderData()
-
   return (
     <div>
       <h1>BB Drink</h1>
