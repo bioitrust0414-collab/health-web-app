@@ -1,7 +1,7 @@
 // src/routes/bb-drink.$productId.tsx
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
-import { getBBDrinkProductById } from '@/server/bb-drink';
+import { getBBDrinkProductById } from '@/api/bb-drink';
 import { useCartStore } from '@/lib/cart';
 import { HeroSection } from '@/components/bb-drink/HeroSection';
 
@@ -76,7 +76,7 @@ function ProductDetailPage() {
               <div>
                 <h3 className="font-semibold text-gray-900">產品特色</h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-gray-600">
-                  {product.benefits.map((b, i) => (
+                  {product.benefits.map((b: string, i: number) => (
                     <li key={i}>{b}</li>
                   ))}
                 </ul>

@@ -55,7 +55,7 @@ export const useAuth = () => {
   // LIFF 自動登入
   const signInWithLIFF = async () => {
     try {
-      await liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
+      await liff.init({ liffId: import.meta.env['VITE_LIFF_ID'] });
       
       if (!liff.isLoggedIn()) {
         liff.login();
@@ -64,7 +64,7 @@ export const useAuth = () => {
 
       // 使用 Supabase LINE OAuth
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'line',
+        provider: 'line' as never,
         options: { redirectTo: window.location.origin }
       });
       
