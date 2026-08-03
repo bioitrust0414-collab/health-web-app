@@ -1,30 +1,25 @@
 // src/server/health.ts
+// SERVER-ONLY. 透過 @/lib/supabaseAdmin 的共用 Admin REST client 存取資料。
 import { createServerFn } from '@tanstack/react-start';
-import { supabaseAdmin } from './supabase-admin';
-import { getSession } from './auth'; // 您的 session 驗證
+import { restGetList } from '@/lib/supabaseAdmin';
+import { verifySessionToken } from '@/lib/sessionToken';
 
-export const getHealthReports = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const session = await getSession();
-    if (!session) throw new Error('Unauthorized');
+export const getHealthReports = createServerFn({ method: 'GET' })
+  .inputValidator((token: string) => token)
+  .handler(async ({ data: token }) => {
+    const userId = await verifySessionToken(token);
+    if (!userId) throw new Error('Unauthorized');
 
-    const { data: reports, error: reportsError } = await supabaseAdmin
-      .from('reports')
-      .select('*')
-      .eq('user_id', session.userId)
-      .order('created_at', { ascending: false });
+    const [reports, dailyLogs] = await Promise.all([
+      restGetList<Record<string, unknown>>(
+        'reports',
+        `user_id=eq.${encodeURIComponent(userId)}&select=*&order=created_at.desc`,
+      ),
+      restGetList<Record<string, unknown>>(
+        'daily_logs',
+        `user_id=eq.${encodeURIComponent(userId)}&select=*&order=date.desc&limit=30`,
+      ),
+    ]);
 
-    if (reportsError) throw new Error(reportsError.message);
-
-    const { data: dailyLogs, error: logsError } = await supabaseAdmin
-      .from('daily_logs')
-      .select('*')
-      .eq('user_id', session.userId)
-      .order('date', { ascending: false })
-      .limit(30);
-
-    if (logsError) throw new Error(logsError.message);
-
-    return { reports: reports ?? [], dailyLogs: dailyLogs ?? [] };
-  }
-);
+    return { reports, dailyLogs };
+  });
