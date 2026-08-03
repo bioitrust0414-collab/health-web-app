@@ -1,11 +1,12 @@
 // src/api/bb-drink.ts
-// Server Function 邊界：Client 端只會拿到 RPC stub，Supabase Admin 金鑰不會進 client bundle。
+// 改用公開權限（Anon Key）查詢，不需要 Admin Key，也不需要登入
 import { createServerFn } from '@tanstack/react-start';
-import { hasSupabaseAdminConfig, restGetList, restGetOne } from '@/lib/supabaseAdmin';
 import type { BBDrinkProduct } from '@/types/bb-drink';
 
-// DB 欄位是 snake_case（跟 products 表同慣例），PostgREST 不會自動轉成
-// camelCase，這裡手動對應成前端型別要的形狀。
+// Server 端讀取環境變數（TanStack Start 會自動注入）
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+
 type BBDrinkProductRow = {
   id: string;
   name: string;
@@ -42,30 +43,52 @@ function mapRow(row: BBDrinkProductRow): BBDrinkProduct {
   };
 }
 
+// 公開查詢輔助函數（使用 Anon Key）
+async function publicGetList<T>(table: string, query: string): Promise<T[]> {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return [];
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+  });
+  if (!res.ok) throw new Error(`Supabase error: ${res.status}`);
+  return res.json();
+}
+
+async function publicGetOne<T>(table: string, query: string): Promise<T | null> {
+  const rows = await publicGetList<T>(table, query);
+  return rows[0] ?? null;
+}
+
 export const fetchBBDrinkData = createServerFn({ method: 'GET' }).handler(
   async () => {
-    // 尚未設定 Supabase 伺服器金鑰時，回傳空清單而不是讓整頁 500（白畫面）。
-    if (!hasSupabaseAdminConfig()) {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
       return { products: [] as BBDrinkProduct[], configured: false };
     }
-    const rows = await restGetList<BBDrinkProductRow>(
-      'bb_drink_products',
-      'is_active=eq.true&select=*&order=sort_order.asc',
-    );
-    return { products: rows.map(mapRow), configured: true };
+    try {
+      const rows = await publicGetList<BBDrinkProductRow>(
+        'bb_drink_products',
+        'is_active=eq.true&select=*&order=sort_order.asc',
+      );
+      return { products: rows.map(mapRow), configured: true };
+    } catch (err) {
+      console.error('fetchBBDrinkData error:', err);
+      return { products: [] as BBDrinkProduct[], configured: false };
+    }
   },
 );
 
 export const getBBDrinkProductById = createServerFn({ method: 'GET' })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
-    if (!hasSupabaseAdminConfig()) {
-      throw new Error('資料庫尚未設定，暫時無法載入商品。');
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      throw new Error('資料庫尚未設定');
     }
-    const row = await restGetOne<BBDrinkProductRow>(
+    const row = await publicGetOne<BBDrinkProductRow>(
       'bb_drink_products',
       `id=eq.${encodeURIComponent(id)}`,
     );
-    if (!row) throw new Error('找不到此商品');
+    if (!row) throw new Error('找不到商品');
     return mapRow(row);
   });
