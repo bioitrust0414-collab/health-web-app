@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { fetchHealthData } from 'src/api/health'
+import { fetchHealthData } from '@/api/health'
 
 export const Route = createFileRoute('/health')({
   loader: async () => {

@@ -1,7 +1,7 @@
 // src/routes/bb-drink.$productId.tsx
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
-import { getBBDrinkProductById } from '@/server/bb-drink';
+import { getBBDrinkProductById } from '@/api/bb-drink';
 import { useCartStore } from '@/lib/cart';
 import { HeroSection } from '@/components/bb-drink/HeroSection';
 
