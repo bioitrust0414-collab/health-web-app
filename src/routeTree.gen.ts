@@ -19,6 +19,7 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as TestsRouteImport } from './routes/tests'
 import { Route as BbDrinkIndexRouteImport } from './routes/bb-drink.index'
 import { Route as BbDrinkProductIdRouteImport } from './routes/bb-drink.$productId'
+import { Route as EducationIndexRouteImport } from './routes/education.index'
 import { Route as AuthLineCallbackRouteImport } from './routes/auth.line.callback'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,11 @@ const BbDrinkProductIdRoute = BbDrinkProductIdRouteImport.update({
   path: '/$productId',
   getParentRoute: () => BbDrinkRoute,
 } as any)
+const EducationIndexRoute = EducationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EducationRoute,
+} as any)
 const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
   id: '/auth/line/callback',
   path: '/auth/line/callback',
@@ -80,7 +86,7 @@ const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bb-drink': typeof BbDrinkRouteWithChildren
-  '/education': typeof EducationRoute
+  '/education': typeof EducationRouteWithChildren
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
@@ -88,11 +94,11 @@ export interface FileRoutesByFullPath {
   '/tests': typeof TestsRoute
   '/bb-drink/$productId': typeof BbDrinkProductIdRoute
   '/bb-drink/': typeof BbDrinkIndexRoute
+  '/education/': typeof EducationIndexRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/education': typeof EducationRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
@@ -100,13 +106,14 @@ export interface FileRoutesByTo {
   '/tests': typeof TestsRoute
   '/bb-drink/$productId': typeof BbDrinkProductIdRoute
   '/bb-drink': typeof BbDrinkIndexRoute
+  '/education': typeof EducationIndexRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bb-drink': typeof BbDrinkRouteWithChildren
-  '/education': typeof EducationRoute
+  '/education': typeof EducationRouteWithChildren
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
@@ -114,6 +121,7 @@ export interface FileRoutesById {
   '/tests': typeof TestsRoute
   '/bb-drink/$productId': typeof BbDrinkProductIdRoute
   '/bb-drink/': typeof BbDrinkIndexRoute
+  '/education/': typeof EducationIndexRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRouteTypes {
@@ -129,11 +137,11 @@ export interface FileRouteTypes {
     | '/tests'
     | '/bb-drink/$productId'
     | '/bb-drink/'
+    | '/education/'
     | '/auth/line/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/education'
     | '/health'
     | '/member'
     | '/reports'
@@ -141,6 +149,7 @@ export interface FileRouteTypes {
     | '/tests'
     | '/bb-drink/$productId'
     | '/bb-drink'
+    | '/education'
     | '/auth/line/callback'
   id:
     | '__root__'
@@ -154,13 +163,14 @@ export interface FileRouteTypes {
     | '/tests'
     | '/bb-drink/$productId'
     | '/bb-drink/'
+    | '/education/'
     | '/auth/line/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BbDrinkRoute: typeof BbDrinkRouteWithChildren
-  EducationRoute: typeof EducationRoute
+  EducationRoute: typeof EducationRouteWithChildren
   HealthRoute: typeof HealthRoute
   MemberRoute: typeof MemberRoute
   ReportsRoute: typeof ReportsRoute
@@ -241,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BbDrinkProductIdRouteImport
       parentRoute: typeof BbDrinkRoute
     }
+    '/education/': {
+      id: '/education/'
+      path: '/'
+      fullPath: '/education/'
+      preLoaderRoute: typeof EducationIndexRouteImport
+      parentRoute: typeof EducationRoute
+    }
     '/auth/line/callback': {
       id: '/auth/line/callback'
       path: '/auth/line/callback'
@@ -264,10 +281,22 @@ const BbDrinkRouteChildren: BbDrinkRouteChildren = {
 const BbDrinkRouteWithChildren =
   BbDrinkRoute._addFileChildren(BbDrinkRouteChildren)
 
+interface EducationRouteChildren {
+  EducationIndexRoute: typeof EducationIndexRoute
+}
+
+const EducationRouteChildren: EducationRouteChildren = {
+  EducationIndexRoute: EducationIndexRoute,
+}
+
+const EducationRouteWithChildren = EducationRoute._addFileChildren(
+  EducationRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BbDrinkRoute: BbDrinkRouteWithChildren,
-  EducationRoute: EducationRoute,
+  EducationRoute: EducationRouteWithChildren,
   HealthRoute: HealthRoute,
   MemberRoute: MemberRoute,
   ReportsRoute: ReportsRoute,
