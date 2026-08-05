@@ -3,7 +3,6 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { getBBDrinkProductById } from '@/api/bb-drink';
 import { useCartStore } from '@/lib/cart';
-import { HeroSection } from '@/components/bb-drink/HeroSection';
 
 export const Route = createFileRoute('/bb-drink/$productId')({
   component: ProductDetailPage,
@@ -20,6 +19,7 @@ export const Route = createFileRoute('/bb-drink/$productId')({
       </Link>
     </div>
   ),
+  notFoundComponent: () => <div className="p-6">找不到商品</div>,
 });
 
 function ProductDetailPage() {
@@ -32,7 +32,7 @@ function ProductDetailPage() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <nav className="mb-6 text-sm text-gray-500">
           <Link to="/bb-drink" className="hover:text-emerald-600">
-            BB 神采速纖飲
+            健康好夥伴
           </Link>
           <span className="mx-2">/</span>
           <span className="text-gray-900">{product.name}</span>
@@ -42,7 +42,7 @@ function ProductDetailPage() {
           {/* 圖片 */}
           <div className="overflow-hidden rounded-2xl bg-gray-50">
             <img
-              src={product.image}
+              src={product.image_url ?? undefined}
               alt={product.name}
               className="h-full w-full object-cover"
             />
@@ -52,39 +52,50 @@ function ProductDetailPage() {
           <div className="space-y-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-              <p className="mt-2 text-lg text-gray-600">{product.subtitle}</p>
+              {product.description && (
+                <p className="mt-2 text-lg text-gray-600">{product.description}</p>
+              )}
             </div>
 
             <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-emerald-700">
-                NT${product.price}
-              </span>
-              {product.originalPrice && (
+              <span className="text-3xl font-bold text-emerald-700">NT${product.price}</span>
+              {product.original_price && (
                 <span className="text-lg text-gray-400 line-through">
-                  NT${product.originalPrice}
+                  NT${product.original_price}
                 </span>
               )}
             </div>
 
             <div className="space-y-4 rounded-xl bg-gray-50 p-6">
-              <div>
-                <h3 className="font-semibold text-gray-900">產品規格</h3>
-                <p className="mt-1 text-gray-600">
-                  口味：{product.flavor} / 淨重：{product.netWeight}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">產品特色</h3>
-                <ul className="mt-2 list-inside list-disc space-y-1 text-gray-600">
-                  {product.benefits.map((b: string, i: number) => (
-                    <li key={i}>{b}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">主要成分</h3>
-                <p className="mt-1 text-gray-600">{product.ingredients.join('、')}</p>
-              </div>
+              {(product.flavor || product.net_weight) && (
+                <div>
+                  <h2 className="font-semibold text-gray-900">產品規格</h2>
+                  <p className="mt-1 text-gray-600">
+                    {[
+                      product.flavor ? `口味：${product.flavor}` : null,
+                      product.net_weight ? `淨重：${product.net_weight}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' / ')}
+                  </p>
+                </div>
+              )}
+              {product.benefits && product.benefits.length > 0 && (
+                <div>
+                  <h2 className="font-semibold text-gray-900">產品特色</h2>
+                  <ul className="mt-2 list-inside list-disc space-y-1 text-gray-600">
+                    {product.benefits.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {product.ingredients && product.ingredients.length > 0 && (
+                <div>
+                  <h2 className="font-semibold text-gray-900">主要成分</h2>
+                  <p className="mt-1 text-gray-600">{product.ingredients.join('、')}</p>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4">
