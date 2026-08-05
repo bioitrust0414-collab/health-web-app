@@ -84,7 +84,7 @@ function ProductDetailPage() {
                 <div>
                   <h2 className="font-semibold text-gray-900">產品特色</h2>
                   <ul className="mt-2 list-inside list-disc space-y-1 text-gray-600">
-                    {product.benefits.map((b) => (
+                    {product.benefits.map((b: string) => (
                       <li key={b}>{b}</li>
                     ))}
                   </ul>
