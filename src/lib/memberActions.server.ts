@@ -188,12 +188,21 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
     sku: string;
     name: string;
     category: string;
+    sub_category: string | null;
+    brand: string | null;
     description: string | null;
     price: number;
     original_price: number | null;
     image_url: string | null;
     stock_quantity: number;
-  }>("products", "is_active=eq.true&order=category.asc,created_at.desc");
+    health_tags: string[] | null;
+    ingredients: string[] | null;
+    benefits: string[] | null;
+    flavor: string | null;
+    net_weight: string | null;
+    is_best_seller: boolean | null;
+    is_new: boolean | null;
+  }>("products", "select=*&is_active=eq.true&order=category.asc,created_at.desc");
 });
 
 // ------------------------------------------------------------------

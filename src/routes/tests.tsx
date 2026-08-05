@@ -36,11 +36,19 @@ const allergyTests = [
   { name: "急慢性過敏原檢測 224 項", desc: "最完整的過敏原全項分析" },
 ];
 
+// 原本放在 /shop 的服務方案，改到這裡走 bookings 預約流程（不再走購物車結帳）。
+const addonServices = [
+  { name: "全身健檢方案", desc: "涵蓋血液、影像與功能檢查的完整全身健康檢查。" },
+  { name: "營養師 1 對 1 諮詢", desc: "依健檢數值量身規劃飲食與生活型態調整。" },
+  { name: "12 週控糖課程", desc: "營養師陪跑 12 週，穩定血糖與代謝指標。" },
+];
+
 const tabs = [
   { id: "general", label: "基礎進階" },
   { id: "special", label: "特定族群" },
   { id: "gene", label: "基因檢測" },
   { id: "allergy", label: "過敏原" },
+  { id: "addon", label: "加購服務" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -107,6 +115,18 @@ function TestsPage() {
                 <p className="text-sm font-bold">{a.name}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{a.desc}</p>
                 <BookButton packageName={a.name} bookingType="allergy_test" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "addon" && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {addonServices.map((s) => (
+              <div key={s.name} className="surface-card p-4">
+                <p className="text-sm font-bold">{s.name}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
+                <BookButton packageName={s.name} bookingType="checkup" />
               </div>
             ))}
           </div>

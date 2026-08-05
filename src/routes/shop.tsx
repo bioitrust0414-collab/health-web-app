@@ -9,22 +9,19 @@ import { getStoredSessionToken } from "@/lib/memberSession";
 import fishOilImg from "@/assets/product-fishoil.jpg";
 import probioticImg from "@/assets/product-probiotic.jpg";
 import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
-import checkupImg from "@/assets/service-checkup.jpg";
-import dietitianImg from "@/assets/service-dietitian.jpg";
-import coachingImg from "@/assets/service-coaching.jpg";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "健康商城｜保健品與健檢方案線上購買" },
+      { title: "健康商城｜保健食品與健康周邊線上購買" },
       {
         name: "description",
-        content: "線上選購魚油、益生菌、藍牙血壓計等保健商品，並預約全身健檢、營養師諮詢與控糖課程。",
+        content: "線上選購魚油、益生菌、藍牙血壓計等保健食品與健康周邊商品，加入購物車即可結帳。",
       },
-      { property: "og:title", content: "健康商城｜保健品與健檢方案線上購買" },
+      { property: "og:title", content: "健康商城｜保健食品與健康周邊線上購買" },
       {
         property: "og:description",
-        content: "實體保健商品與健康服務方案一站購足，加入購物車即可結帳。",
+        content: "保健食品與健康周邊商品一站購足，健檢與諮詢服務請至檢驗套組頁面預約。",
       },
     ],
   }),
@@ -36,17 +33,16 @@ const PRODUCT_IMAGES: Record<string, string> = {
   "fish-oil-90": fishOilImg,
   "probiotic-fiber-30d": probioticImg,
   "bp-monitor-bluetooth": bpMonitorImg,
-  "checkup-full-body": checkupImg,
-  "dietitian-1on1": dietitianImg,
-  "glucose-coaching-12wk": coachingImg,
 };
 
 const filters = [
   { id: "all", label: "全部" },
   { id: "supplement", label: "保健商品" },
   { id: "device", label: "健康裝置" },
-  { id: "service", label: "服務方案" },
 ] as const;
+
+// /shop 只賣實體商品；服務方案（健檢、諮詢、課程）改由 /tests 走真正的預約流程。
+const SHOP_CATEGORIES = ["supplement", "device"];
 
 function ShopPage() {
   const { getSessionToken } = useSessionToken();
@@ -70,7 +66,10 @@ function ShopPage() {
   });
 
   const list = useMemo(
-    () => (products ?? []).filter((p) => filter === "all" || p.category === filter),
+    () =>
+      (products ?? [])
+        .filter((p) => SHOP_CATEGORIES.includes(p.category))
+        .filter((p) => filter === "all" || p.category === filter),
     [products, filter],
   );
 
@@ -145,10 +144,48 @@ function ShopPage() {
                   className="aspect-[4/3] w-full object-cover"
                 />
               </div>
-              <div className="mt-4 flex items-start justify-between gap-2">
+              <div className="mt-4 flex flex-wrap items-start justify-between gap-2">
                 <h2 className="min-w-0 text-sm font-bold">{p.name}</h2>
+                <div className="flex shrink-0 gap-1.5">
+                  {p.is_best_seller ? (
+                    <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-bold text-amber-600">
+                      熱銷
+                    </span>
+                  ) : null}
+                  {p.is_new ? (
+                    <span className="rounded-full bg-primary/12 px-2 py-0.5 text-[11px] font-bold text-primary">
+                      新品
+                    </span>
+                  ) : null}
+                </div>
               </div>
-              <p className="mt-1 flex-1 text-xs text-muted-foreground">{p.description}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{p.description}</p>
+              <dl className="mt-2 flex-1 grid gap-1 text-[11px] text-muted-foreground">
+                {p.flavor ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">口味</dt>
+                    <dd className="min-w-0">{p.flavor}</dd>
+                  </div>
+                ) : null}
+                {p.net_weight ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">規格</dt>
+                    <dd className="min-w-0">{p.net_weight}</dd>
+                  </div>
+                ) : null}
+                {p.ingredients?.length ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">成分</dt>
+                    <dd className="min-w-0">{p.ingredients.join("、")}</dd>
+                  </div>
+                ) : null}
+                {p.benefits?.length ? (
+                  <div className="flex gap-1">
+                    <dt className="font-semibold">特色</dt>
+                    <dd className="min-w-0">{p.benefits.join("／")}</dd>
+                  </div>
+                ) : null}
+              </dl>
               <div className="mt-4 flex items-center justify-between gap-3">
                 <span className="text-base font-bold text-primary tabular-nums">
                   NT$ {p.price.toLocaleString()}
@@ -159,7 +196,7 @@ function ShopPage() {
                   className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition active:scale-[0.97]"
                 >
                   <Plus className="h-4 w-4" />
-                  {p.category === "service" ? "預約" : "加入購物車"}
+                  加入購物車
                 </button>
               </div>
               {cart[p.id] ? (
