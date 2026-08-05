@@ -217,23 +217,44 @@ export const getMemberDashboard = createServerFn({ method: "GET" })
   })
   .handler(async ({ data: sessionToken }) => {
     const { verifySessionToken } = await import("./sessionToken");
-    const { restGetList, restGetOne } = await import("./supabaseAdmin");
+    const { hasSupabaseAdminConfig, restGetList, restGetOne } = await import("./supabaseAdmin");
     const profileId = await verifySessionToken(sessionToken);
 
-    const [bookings, orders, pointsBalance, stampCard] = await Promise.all([
-      restGetList<BookingRow>("bookings", `profile_id=eq.${profileId}&order=created_at.desc&limit=10`),
-      restGetList<OrderRow>("orders", `profile_id=eq.${profileId}&order=created_at.desc&limit=10`),
-      restGetOne<PointsBalanceRow>("member_points_balance", `profile_id=eq.${profileId}`),
-      restGetOne<StampCardRow>("stamp_cards", `profile_id=eq.${profileId}&card_type=eq.default`),
-    ]);
+    if (!hasSupabaseAdminConfig()) {
+      return {
+        bookings: [] as BookingRow[],
+        orders: [] as OrderRow[],
+        points: 0,
+        stamps: 0,
+        stampGoal: STAMP_GOAL,
+      };
+    }
 
-    return {
-      bookings,
-      orders,
-      points: pointsBalance?.total_points ?? 0,
-      stamps: stampCard?.current_stamps ?? 0,
-      stampGoal: stampCard?.total_stamps ?? STAMP_GOAL,
-    };
+    try {
+      const [bookings, orders, pointsBalance, stampCard] = await Promise.all([
+        restGetList<BookingRow>("bookings", `profile_id=eq.${profileId}&order=created_at.desc&limit=10`),
+        restGetList<OrderRow>("orders", `profile_id=eq.${profileId}&order=created_at.desc&limit=10`),
+        restGetOne<PointsBalanceRow>("member_points_balance", `profile_id=eq.${profileId}`),
+        restGetOne<StampCardRow>("stamp_cards", `profile_id=eq.${profileId}&card_type=eq.default`),
+      ]);
+
+      return {
+        bookings,
+        orders,
+        points: pointsBalance?.total_points ?? 0,
+        stamps: stampCard?.current_stamps ?? 0,
+        stampGoal: stampCard?.total_stamps ?? STAMP_GOAL,
+      };
+    } catch (error) {
+      console.error("Member dashboard data is unavailable; returning an empty dashboard.", error);
+      return {
+        bookings: [] as BookingRow[],
+        orders: [] as OrderRow[],
+        points: 0,
+        stamps: 0,
+        stampGoal: STAMP_GOAL,
+      };
+    }
   });
 
 // ------------------------------------------------------------------
