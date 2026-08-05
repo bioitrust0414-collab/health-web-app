@@ -51,7 +51,7 @@ export function CartDrawer() {
                       className="flex gap-4 rounded-xl border p-3"
                     >
                       <img
-                        src={product.image}
+                        src={product.image_url ?? undefined}
                         alt={product.name}
                         className="h-20 w-20 rounded-lg object-cover"
                       />
