@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BbDrinkRouteImport } from './routes/bb-drink'
+import { Route as EducationRouteImport } from './routes/education'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as MemberRouteImport } from './routes/member'
 import { Route as ReportsRouteImport } from './routes/reports'
@@ -28,6 +29,11 @@ const IndexRoute = IndexRouteImport.update({
 const BbDrinkRoute = BbDrinkRouteImport.update({
   id: '/bb-drink',
   path: '/bb-drink',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EducationRoute = EducationRouteImport.update({
+  id: '/education',
+  path: '/education',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthRoute = HealthRouteImport.update({
@@ -74,6 +80,7 @@ const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/bb-drink': typeof BbDrinkRouteWithChildren
+  '/education': typeof EducationRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/education': typeof EducationRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/bb-drink': typeof BbDrinkRouteWithChildren
+  '/education': typeof EducationRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
   '/reports': typeof ReportsRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/bb-drink'
+    | '/education'
     | '/health'
     | '/member'
     | '/reports'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/education'
     | '/health'
     | '/member'
     | '/reports'
@@ -135,6 +146,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/bb-drink'
+    | '/education'
     | '/health'
     | '/member'
     | '/reports'
@@ -148,6 +160,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BbDrinkRoute: typeof BbDrinkRouteWithChildren
+  EducationRoute: typeof EducationRoute
   HealthRoute: typeof HealthRoute
   MemberRoute: typeof MemberRoute
   ReportsRoute: typeof ReportsRoute
@@ -170,6 +183,13 @@ declare module '@tanstack/react-router' {
       path: '/bb-drink'
       fullPath: '/bb-drink'
       preLoaderRoute: typeof BbDrinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/education': {
+      id: '/education'
+      path: '/education'
+      fullPath: '/education'
+      preLoaderRoute: typeof EducationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health': {
@@ -247,6 +267,7 @@ const BbDrinkRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BbDrinkRoute: BbDrinkRouteWithChildren,
+  EducationRoute: EducationRoute,
   HealthRoute: HealthRoute,
   MemberRoute: MemberRoute,
   ReportsRoute: ReportsRoute,
@@ -257,3 +278,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

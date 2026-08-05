@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import dahuaCss from "@/styles/dahua.css?url";
 
 export const Route = createFileRoute("/education")({
