@@ -10,7 +10,12 @@ import { Activity } from "lucide-react";
 
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
 import { setStoredProfileId, setStoredSessionToken, getStoredSessionToken } from "@/lib/memberSession";
-import { getMemberDashboard, verifyLiffLogin, issueDemoToken } from "@/lib/memberActions.server";
+import {
+  getMemberDashboard,
+  verifyLiffLogin,
+  issueDemoToken,
+  verifyAndLinkProfile,
+} from "@/lib/memberActions.server";
 
 
 // 還沒有 LIFF ID（等大華官方帳號那邊協調好 LINE Developers 權限、建好 LIFF app
