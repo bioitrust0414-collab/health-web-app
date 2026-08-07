@@ -41,9 +41,9 @@ export const Route = createFileRoute("/auth/line/callback")({
   loader: async ({ deps }) => {
     const result = await handleLineCallback({ data: deps });
     if (result.needsVerification) {
-      throw redirect({ to: "/member", search: { lineUserId: result.lineUserId } });
+      throw redirect({ to: "/member", search: { lineUserId: result.lineUserId, profileId: undefined, token: undefined } });
     }
-    throw redirect({ to: "/member", search: { profileId: result.profileId, token: result.token } });
+    throw redirect({ to: "/member", search: { profileId: result.profileId, token: result.token, lineUserId: undefined } });
   },
   component: () => null,
 });

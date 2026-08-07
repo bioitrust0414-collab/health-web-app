@@ -100,7 +100,7 @@ export function BookingSection() {
                   <div className="contact-icon">{c.icon}</div>
                   <div className="contact-title">{c.title}</div>
                   <div className="contact-info">{c.info}</div>
-                  <Link to="/member" search={{ profileId: undefined, token: undefined }} className="contact-link">
+                  <Link to="/member" search={{ profileId: undefined, token: undefined, lineUserId: undefined }} className="contact-link">
                     前往會員專區 →
                   </Link>
                 </div>
@@ -196,7 +196,7 @@ export function BookingSection() {
               </p>
               <Link
                 to="/member"
-                search={{ profileId: undefined, token: undefined }}
+                search={{ profileId: undefined, token: undefined, lineUserId: undefined }}
                 className="form-submit"
                 style={{
                   display: "inline-block",

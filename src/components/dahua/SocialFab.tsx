@@ -20,7 +20,7 @@ export function SocialFab() {
         f
       </a>
       {isMember ? (
-        <Link to="/member" search={{ profileId: undefined, token: undefined }} className="social-btn line">
+        <Link to="/member" search={{ profileId: undefined, token: undefined, lineUserId: undefined }} className="social-btn line">
           LINE
         </Link>
       ) : (
