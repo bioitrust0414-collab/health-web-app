@@ -29,7 +29,7 @@ export const Route = createFileRoute("/shop")({
 
 function ShopPage() {
   const { getSessionToken } = useSessionToken();
-  const [filter, setFilter] = useState<(typeof filters)[number]["id"]>("all");
+  const [filter, setFilter] = useState<string>("all");
   const [cart, setCart] = useState<Record<string, number>>({});
   const [checkoutState, setCheckoutState] = useState<"idle" | "loading" | "error">("idle");
   const [checkoutResult, setCheckoutResult] = useState<{ orderNo: string; pointsEarned: number } | null>(
@@ -48,13 +48,22 @@ function ShopPage() {
     enabled: Boolean(sessionToken),
   });
 
+  // 分類 tab 直接依商品的 sub_category（沒有 sub_category 時退回 category）動態產生。
+  const filters = useMemo(() => {
+    const groups = Array.from(
+      new Set((products ?? []).map((p) => p.sub_category ?? p.category)),
+    );
+    return [{ id: "all", label: "全部" }, ...groups.map((g) => ({ id: g, label: g }))];
+  }, [products]);
+
   const list = useMemo(
     () =>
-      (products ?? [])
-        .filter((p) => SHOP_CATEGORIES.includes(p.category))
-        .filter((p) => filter === "all" || p.category === filter),
+      (products ?? []).filter(
+        (p) => filter === "all" || (p.sub_category ?? p.category) === filter,
+      ),
     [products, filter],
   );
+
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const cartTotal = (products ?? []).reduce((sum, p) => sum + (cart[p.id] ?? 0) * p.price, 0);
