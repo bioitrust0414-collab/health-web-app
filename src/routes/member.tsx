@@ -356,13 +356,19 @@ const loginSourceLabel: Record<"demo" | "line" | "line_web", string> = {
 
 function MemberPage() {
   const demoData = Route.useLoaderData();
-  const { profileId: webProfileId, token: webToken } = Route.useSearch();
+  const {
+    profileId: webProfileId,
+    token: webToken,
+    lineUserId: webLineUserId,
+  } = Route.useSearch();
   const {
     profileId,
     sessionToken,
     source,
     error: liffError,
-  } = useLineProfileId(webProfileId, webToken);
+    pendingLineUserId,
+    completeVerification,
+  } = useLineProfileId(webProfileId, webToken, webLineUserId);
 
   // Once LIFF or the web login hands us a real profileId, refetch with the
   // real data instead of the SSR-loaded demo data.
@@ -372,6 +378,7 @@ function MemberPage() {
     enabled: source !== "demo",
     initialData: source === "demo" ? demoData : undefined,
   });
+
 
   const { data: dashboard } = useQuery({
     queryKey: ["member-dashboard", sessionToken],
