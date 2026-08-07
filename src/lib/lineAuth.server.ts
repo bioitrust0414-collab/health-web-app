@@ -65,13 +65,13 @@ async function verifyLineIdToken(idToken: string): Promise<LineVerifyResponse> {
 }
 
 /** LIFF path: browser already has an ID token from the LIFF SDK. */
-export async function upsertProfileForLineUser(idToken: string): Promise<LineProfile> {
+export async function upsertProfileForLineUser(idToken: string): Promise<LineLoginResult> {
   const claims = await verifyLineIdToken(idToken);
   return upsertProfileForClaims(claims);
 }
 
 /** Standalone web LINE Login path: exchange an OAuth authorization code for tokens. */
-export async function exchangeCodeForProfile(code: string, redirectUri: string): Promise<LineProfile> {
+export async function exchangeCodeForProfile(code: string, redirectUri: string): Promise<LineLoginResult> {
   const channelId = process.env["LINE_LOGIN_CHANNEL_ID"];
   const channelSecret = process.env["LINE_LOGIN_CHANNEL_SECRET"];
   if (!channelId || !channelSecret) {
@@ -99,7 +99,7 @@ export async function exchangeCodeForProfile(code: string, redirectUri: string):
   return upsertProfileForClaims(claims);
 }
 
-async function upsertProfileForClaims(claims: LineVerifyResponse): Promise<LineProfile> {
+async function upsertProfileForClaims(claims: LineVerifyResponse): Promise<LineLoginResult> {
   const existing = await restGetOne<{ id: string; full_name: string | null }>(
     "profiles",
     `line_user_id=eq.${claims.sub}`,
@@ -113,19 +113,105 @@ async function upsertProfileForClaims(claims: LineVerifyResponse): Promise<LineP
     };
   }
 
-  // New LINE user: create an auth user first (profiles.id has a FK to
-  // auth.users). handle_new_user trigger creates the bare profile row;
-  // we then enrich it with LINE data below.
-  const created = await adminCreateUser({
-    email: `line-${claims.sub}@liff.dahua-health-app.local`,
-    email_confirm: true,
-    user_metadata: { line_user_id: claims.sub, source: "line_login" },
-  });
-
-  await restPatch("profiles", `id=eq.${created.id}`, {
-    line_user_id: claims.sub,
-    full_name: claims.name ?? null,
-  });
-
-  return { profileId: created.id, lineUserId: claims.sub, displayName: claims.name ?? null };
+  // Brand-new LINE user: do NOT create a profile here. Creating one blind
+  // would orphan any existing 健檢 (LIS) records that already sit on a
+  // placeholder profile for this person. Ask the frontend to collect
+  // name / birthday / last-4-of-phone and call verifyAndLinkProfile.
+  return {
+    needsVerification: true,
+    lineUserId: claims.sub,
+    displayName: claims.name ?? null,
+  };
 }
+
+// ------------------------------------------------------------------
+// 身分驗證綁定：把新的 LINE 使用者接到既有的健檢會員資料上
+// ------------------------------------------------------------------
+
+/** 姓名正規化：全形→半形（NFKC）、去掉所有空白、統一小寫。 */
+function normalizeName(value: string): string {
+  return value.normalize("NFKC").replace(/\s+/gu, "").toLowerCase();
+}
+
+/** 手機正規化：NFKC（處理全形數字）後只留數字。 */
+function normalizeDigits(value: string): string {
+  return value.normalize("NFKC").replace(/\D+/gu, "");
+}
+
+/** 生日正規化成 YYYY-MM-DD；接受 1990/5/18、1990-05-18、全形數字等寫法。 */
+function normalizeBirthday(value: string): string | null {
+  const digits = normalizeDigits(value);
+  if (digits.length !== 8) return null;
+  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+}
+
+export interface VerifyAndLinkInput {
+  lineUserId: string;
+  fullName: string;
+  birthday: string;
+  phoneLast4: string;
+}
+
+export type VerifyAndLinkResult =
+  | { success: true; profileId: string; lineUserId: string; displayName: string | null }
+  | { success: false; message: string };
+
+const NO_MATCH_MESSAGE =
+  "查無符合的健檢會員資料，請確認姓名/生日/手機是否與健檢時填寫的一致，或洽門市協助。";
+
+export async function verifyAndLinkLineProfile(input: VerifyAndLinkInput): Promise<VerifyAndLinkResult> {
+  const lineUserId = input.lineUserId.trim();
+  const name = normalizeName(input.fullName ?? "");
+  const birthday = normalizeBirthday(input.birthday ?? "");
+  const last4 = normalizeDigits(input.phoneLast4 ?? "").slice(-4);
+
+  if (!lineUserId) return { success: false, message: "LINE 登入資訊不完整，請重新登入。" };
+  if (!name) return { success: false, message: "請填寫姓名。" };
+  if (!birthday) return { success: false, message: "請填寫正確的生日（例如 1990-05-18）。" };
+  if (last4.length !== 4) return { success: false, message: "請填寫手機號碼末 4 碼。" };
+
+  // 這個 LINE 帳號已經綁過了（例如重複送出表單）→ 直接回傳既有 profile。
+  const alreadyBound = await restGetOne<{ id: string; full_name: string | null }>(
+    "profiles",
+    `line_user_id=eq.${encodeURIComponent(lineUserId)}`,
+  );
+  if (alreadyBound) {
+    return {
+      success: true,
+      profileId: alreadyBound.id,
+      lineUserId,
+      displayName: alreadyBound.full_name,
+    };
+  }
+
+  // 只撈「生日相符 + 還沒被綁定」的候選，姓名與手機末碼在這裡做正規化比對，
+  // 避免全形/空白/大小寫差異造成比對失敗。
+  const candidates = await restGetList<{ id: string; full_name: string | null; phone: string | null }>(
+    "profiles",
+    `select=id,full_name,phone&birthday=eq.${birthday}&line_user_id=is.null`,
+  );
+
+  const matches = candidates.filter(
+    (row) =>
+      row.full_name != null &&
+      normalizeName(row.full_name) === name &&
+      row.phone != null &&
+      normalizeDigits(row.phone).slice(-4) === last4,
+  );
+
+  if (matches.length !== 1) {
+    // 0 筆：查無資料。多筆：資料重複，需人工確認，同樣不自動建立新帳號。
+    return { success: false, message: NO_MATCH_MESSAGE };
+  }
+
+  const matched = matches[0]!;
+  await restPatch("profiles", `id=eq.${matched.id}`, { line_user_id: lineUserId });
+
+  return {
+    success: true,
+    profileId: matched.id,
+    lineUserId,
+    displayName: matched.full_name,
+  };
+}
+
