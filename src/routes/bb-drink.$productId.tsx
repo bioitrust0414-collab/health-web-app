@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { getBBDrinkProductById } from '@/api/bb-drink';
 import { useCartStore } from '@/lib/cart';
+import { productImage } from '@/lib/productImages';
 
 export const Route = createFileRoute('/bb-drink/$productId')({
   component: ProductDetailPage,
@@ -42,7 +43,7 @@ function ProductDetailPage() {
           {/* 圖片 */}
           <div className="overflow-hidden rounded-2xl bg-gray-50">
             <img
-              src={product.image_url ?? undefined}
+              src={productImage(product.sku, product.image_url)}
               alt={product.name}
               className="h-full w-full object-cover"
             />

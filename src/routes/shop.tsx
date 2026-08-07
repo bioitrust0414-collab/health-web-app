@@ -128,7 +128,7 @@ function ShopPage() {
             <article key={p.id} className="surface-card flex flex-col p-5">
               <div className="overflow-hidden rounded-xl bg-accent">
                 <img
-                  src={PRODUCT_IMAGES[p.sku] ?? p.image_url ?? undefined}
+                  src={productImage(p.sku, p.image_url)}
                   alt={p.name}
                   loading="lazy"
                   width={768}

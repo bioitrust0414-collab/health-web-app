@@ -1,6 +1,7 @@
 // src/components/bb-drink/ProductGrid.tsx
 import { Link } from '@tanstack/react-router';
 import { useCartStore } from '@/lib/cart';
+import { productImage } from '@/lib/productImages';
 import type { BBDrinkProduct } from '@/types/bb-drink';
 
 interface ProductGridProps {
@@ -43,7 +44,7 @@ export function ProductGrid({ products }: ProductGridProps) {
                 <Link to="/bb-drink/$productId" params={{ productId: product.sku }}>
                   <div className="aspect-square overflow-hidden bg-gray-100">
                     <img
-                      src={product.image_url ?? undefined}
+                      src={productImage(product.sku, product.image_url)}
                       alt={product.name}
                       className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
