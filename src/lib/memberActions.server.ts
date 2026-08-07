@@ -62,9 +62,48 @@ export const verifyLiffLogin = createServerFn({ method: "POST" })
   .handler(async ({ data: idToken }) => {
     const { upsertProfileForLineUser } = await import("./lineAuth.server");
     const { issueSessionToken } = await import("./sessionToken");
-    const profile = await upsertProfileForLineUser(idToken);
+    const result = await upsertProfileForLineUser(idToken);
+
+    // 全新的 LINE 使用者：還不知道他是哪一位健檢會員，先請前端收集
+    // 姓名/生日/手機末 4 碼，不發 session token、也不建立新 profile。
+    if ("needsVerification" in result && result.needsVerification) {
+      return {
+        needsVerification: true as const,
+        lineUserId: result.lineUserId,
+        displayName: result.displayName,
+      };
+    }
+
+    const profile = result as { profileId: string; lineUserId: string; displayName: string | null };
     const token = await issueSessionToken(profile.profileId);
-    return { ...profile, token };
+    return { needsVerification: false as const, ...profile, token };
+  });
+
+// 第一次 LINE 登入的身分驗證：用姓名 + 生日 + 手機末 4 碼比對既有健檢會員
+// 資料，成功才把 line_user_id 寫進那筆 profile 並發 session token。
+export const verifyAndLinkProfile = createServerFn({ method: "POST" })
+  .validator((data: unknown) => {
+    const input = data as {
+      lineUserId?: unknown;
+      fullName?: unknown;
+      birthday?: unknown;
+      phoneLast4?: unknown;
+    };
+    const asString = (value: unknown) => (typeof value === "string" ? value : "");
+    return {
+      lineUserId: asString(input.lineUserId),
+      fullName: asString(input.fullName),
+      birthday: asString(input.birthday),
+      phoneLast4: asString(input.phoneLast4),
+    };
+  })
+  .handler(async ({ data }) => {
+    const { verifyAndLinkLineProfile } = await import("./lineAuth.server");
+    const { issueSessionToken } = await import("./sessionToken");
+    const result = await verifyAndLinkLineProfile(data);
+    if (!result.success) return result;
+    const token = await issueSessionToken(result.profileId);
+    return { ...result, token };
   });
 
 // Demo 模式（LIFF 還沒設定時）也要能示範預約/商城/會員儀表板，所以幫固定的
@@ -73,6 +112,7 @@ export const issueDemoToken = createServerFn({ method: "GET" }).handler(async ()
   const { issueSessionToken } = await import("./sessionToken");
   return issueSessionToken(DEMO_PROFILE_ID);
 });
+
 
 // ------------------------------------------------------------------
 // 預約
