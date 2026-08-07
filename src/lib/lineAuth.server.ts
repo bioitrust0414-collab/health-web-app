@@ -5,7 +5,7 @@
 // Supabase (see supabaseAdmin.ts) rather than the supabase-js client —
 // see that file's comment for why.
 
-import { restGetOne, restPatch, adminCreateUser } from "./supabaseAdmin";
+import { restGetOne, restGetList, restPatch } from "./supabaseAdmin";
 
 interface LineVerifyResponse {
   iss: string;
@@ -22,7 +22,18 @@ export interface LineProfile {
   profileId: string;
   lineUserId: string;
   displayName: string | null;
+  needsVerification?: false;
 }
+
+/** Returned when this LINE user has never been bound to a profile yet. */
+export interface LineNeedsVerification {
+  needsVerification: true;
+  lineUserId: string;
+  displayName: string | null;
+}
+
+export type LineLoginResult = LineProfile | LineNeedsVerification;
+
 
 async function verifyLineIdToken(idToken: string): Promise<LineVerifyResponse> {
   const channelId = process.env["LINE_LOGIN_CHANNEL_ID"];
