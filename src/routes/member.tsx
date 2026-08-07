@@ -105,7 +105,9 @@ export const Route = createFileRoute("/member")({
   validateSearch: (search: Record<string, unknown>) => ({
     profileId: typeof search["profileId"] === "string" ? search["profileId"] : undefined,
     token: typeof search["token"] === "string" ? search["token"] : undefined,
+    lineUserId: typeof search["lineUserId"] === "string" ? search["lineUserId"] : undefined,
   }),
+
   loaderDeps: ({ search }) => ({ profileId: search["profileId"] }),
   loader: ({ deps }) => getMemberData({ data: deps["profileId"] ?? DEMO_PROFILE_ID }),
   component: MemberPage,
