@@ -128,24 +128,36 @@ const genderLabel: Record<string, string> = {
   prefer_not_to_say: "不願透露",
 };
 
-function useLineProfileId(
-  webProfileId: string | undefined,
-  webToken: string | undefined,
-): {
+interface LineLoginState {
   profileId: string;
   sessionToken: string | null;
   source: "demo" | "line" | "line_web";
   error: string | null;
-} {
-  const [state, setState] = useState<{
-    profileId: string;
-    sessionToken: string | null;
-    source: "demo" | "line" | "line_web";
-    error: string | null;
-  }>(
+  /** 全新的 LINE 使用者：需要先做健檢會員身分驗證才拿得到 profile。 */
+  pendingLineUserId: string | null;
+}
+
+function useLineProfileId(
+  webProfileId: string | undefined,
+  webToken: string | undefined,
+  webLineUserId: string | undefined,
+): LineLoginState & { completeVerification: (profileId: string, token: string) => void } {
+  const [state, setState] = useState<LineLoginState>(
     webProfileId && webToken
-      ? { profileId: webProfileId, sessionToken: webToken, source: "line_web", error: null }
-      : { profileId: DEMO_PROFILE_ID, sessionToken: getStoredSessionToken(), source: "demo", error: null },
+      ? {
+          profileId: webProfileId,
+          sessionToken: webToken,
+          source: "line_web",
+          error: null,
+          pendingLineUserId: null,
+        }
+      : {
+          profileId: DEMO_PROFILE_ID,
+          sessionToken: getStoredSessionToken(),
+          source: "demo",
+          error: null,
+          pendingLineUserId: webLineUserId ?? null,
+        },
   );
 
   useEffect(() => {
@@ -155,6 +167,12 @@ function useLineProfileId(
       // to the member area instead of the add-friend flow.
       setStoredProfileId(webProfileId);
       setStoredSessionToken(webToken);
+      return;
+    }
+
+    // 網頁版 LINE 登入回來時已經確定是全新的 LINE 使用者 → 直接顯示驗證表單。
+    if (webLineUserId) {
+      setState((prev) => ({ ...prev, pendingLineUserId: webLineUserId }));
       return;
     }
 
@@ -183,12 +201,24 @@ function useLineProfileId(
       try {
         await ensureLiffLogin();
         const idToken = getLiffIdToken();
-        const { profileId, token } = await verifyLiffLogin({ data: idToken });
-        if (!cancelled) {
-          setStoredProfileId(profileId);
-          setStoredSessionToken(token);
-          setState({ profileId, sessionToken: token, source: "line", error: null });
+        const result = await verifyLiffLogin({ data: idToken });
+        if (cancelled) return;
+
+        // 這個 line_user_id 還沒綁定過任何健檢會員 → 只觸發一次的身分驗證表單。
+        if (result.needsVerification) {
+          setState((prev) => ({ ...prev, pendingLineUserId: result.lineUserId, error: null }));
+          return;
         }
+
+        setStoredProfileId(result.profileId);
+        setStoredSessionToken(result.token);
+        setState({
+          profileId: result.profileId,
+          sessionToken: result.token,
+          source: "line",
+          error: null,
+          pendingLineUserId: null,
+        });
       } catch (error) {
         if (!cancelled) {
           setState((prev) => ({
@@ -202,10 +232,121 @@ function useLineProfileId(
     return () => {
       cancelled = true;
     };
-  }, [webProfileId, webToken]);
+  }, [webProfileId, webToken, webLineUserId]);
 
-  return state;
+  const completeVerification = (profileId: string, token: string) => {
+    setStoredProfileId(profileId);
+    setStoredSessionToken(token);
+    setState({
+      profileId,
+      sessionToken: token,
+      source: "line",
+      error: null,
+      pendingLineUserId: null,
+    });
+  };
+
+  return { ...state, completeVerification };
 }
+
+function VerifyMemberForm({
+  lineUserId,
+  onLinked,
+}: {
+  lineUserId: string;
+  onLinked: (profileId: string, token: string) => void;
+}) {
+  const [fullName, setFullName] = useState("");
+  const [birthday, setBirthday] = useState("");
+  const [phoneLast4, setPhoneLast4] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await verifyAndLinkProfile({
+        data: { lineUserId, fullName, birthday, phoneLast4 },
+      });
+      if (result.success) {
+        onLinked(result.profileId, result.token);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "驗證失敗，請稍後再試。");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <AppShell title="驗證健檢會員身分" subtitle="第一次用 LINE 登入，請確認您的健檢資料">
+      <div className="grid gap-5 pb-8">
+        <form onSubmit={submit} className="surface-card grid gap-4 p-5 md:p-8">
+          <p className="text-sm text-muted-foreground">
+            為了把您的健檢報告正確對應到這個 LINE 帳號，請輸入與健檢時填寫一致的資料。驗證只需做一次。
+          </p>
+          <label className="grid gap-1.5 text-sm">
+            <span className="font-semibold">姓名</span>
+            <input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              maxLength={50}
+              placeholder="王小明"
+              className="rounded-xl border border-border bg-background px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="grid gap-1.5 text-sm">
+            <span className="font-semibold">生日</span>
+            <input
+              type="date"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+              required
+              className="rounded-xl border border-border bg-background px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="grid gap-1.5 text-sm">
+            <span className="font-semibold">手機末 4 碼</span>
+            <input
+              value={phoneLast4}
+              onChange={(e) => setPhoneLast4(e.target.value)}
+              required
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="1234"
+              className="rounded-xl border border-border bg-background px-3 py-2 text-sm tabular-nums"
+            />
+          </label>
+
+          {error && (
+            <div className="rounded-xl bg-destructive/10 p-3 text-xs text-destructive">
+              <p>{error}</p>
+              <p className="mt-1.5 text-muted-foreground">
+                若資料確認無誤仍無法驗證，請洽門市協助：電話 04-728-1234，或加入 LINE 官方帳號 @929esael
+                由客服人員為您查詢。
+              </p>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground disabled:opacity-60"
+          >
+            {submitting ? "驗證中…" : "驗證並綁定"}
+          </button>
+        </form>
+        <LineOaCard />
+      </div>
+    </AppShell>
+  );
+}
+
 
 const loginSourceLabel: Record<"demo" | "line" | "line_web", string> = {
   line: "已透過 LINE 登入（LIFF）",
