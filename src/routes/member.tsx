@@ -393,6 +393,12 @@ function MemberPage() {
 
   const { profile, reports } = data ?? demoData;
 
+  // 全新的 LINE 使用者：先驗證身分綁定既有健檢會員，通過後才進入儀表板。
+  if (pendingLineUserId) {
+    return <VerifyMemberForm lineUserId={pendingLineUserId} onLinked={completeVerification} />;
+  }
+
+
   return (
     <AppShell title={profile.full_name ?? "會員資料"} subtitle={loginSourceLabel[source]}>
       <div className="grid gap-5 pb-8 lg:grid-cols-2">
