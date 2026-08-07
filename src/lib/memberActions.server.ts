@@ -202,7 +202,8 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
     net_weight: string | null;
     is_best_seller: boolean | null;
     is_new: boolean | null;
-  }>("products", "select=*&is_active=eq.true&order=category.asc,created_at.desc");
+  }>("products",
+    `select=*&is_active=eq.true&brand=eq.${encodeURIComponent("健康好夥伴")}&order=created_at.asc`);
 });
 
 // ------------------------------------------------------------------

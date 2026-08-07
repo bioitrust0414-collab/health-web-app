@@ -6,9 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { getProducts, createOrder, getMemberDashboard } from "@/lib/memberActions.server";
 import { useSessionToken } from "@/lib/useSessionToken";
 import { getStoredSessionToken } from "@/lib/memberSession";
-import fishOilImg from "@/assets/product-fishoil.jpg";
-import probioticImg from "@/assets/product-probiotic.jpg";
-import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
+import { productImage } from "@/lib/productImages";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -16,37 +14,22 @@ export const Route = createFileRoute("/shop")({
       { title: "健康商城｜保健食品與健康周邊線上購買" },
       {
         name: "description",
-        content: "線上選購魚油、益生菌、藍牙血壓計等保健食品與健康周邊商品，加入購物車即可結帳。",
+        content: "線上選購健康好夥伴系列保健食品，加入購物車即可結帳。",
       },
       { property: "og:title", content: "健康商城｜保健食品與健康周邊線上購買" },
       {
         property: "og:description",
-        content: "保健食品與健康周邊商品一站購足，健檢與諮詢服務請至檢驗套組頁面預約。",
+        content: "健康好夥伴系列保健食品一站購足，健檢與諮詢服務請至檢驗套組頁面預約。",
       },
     ],
   }),
   component: ShopPage,
 });
 
-// 商品圖目前還是用本地素材（跟商品 sku 對應），還沒有導入圖床/CDN 網址。
-const PRODUCT_IMAGES: Record<string, string> = {
-  "fish-oil-90": fishOilImg,
-  "probiotic-fiber-30d": probioticImg,
-  "bp-monitor-bluetooth": bpMonitorImg,
-};
-
-const filters = [
-  { id: "all", label: "全部" },
-  { id: "supplement", label: "保健商品" },
-  { id: "device", label: "健康裝置" },
-] as const;
-
-// /shop 只賣實體商品；服務方案（健檢、諮詢、課程）改由 /tests 走真正的預約流程。
-const SHOP_CATEGORIES = ["supplement", "device"];
 
 function ShopPage() {
   const { getSessionToken } = useSessionToken();
-  const [filter, setFilter] = useState<(typeof filters)[number]["id"]>("all");
+  const [filter, setFilter] = useState<string>("all");
   const [cart, setCart] = useState<Record<string, number>>({});
   const [checkoutState, setCheckoutState] = useState<"idle" | "loading" | "error">("idle");
   const [checkoutResult, setCheckoutResult] = useState<{ orderNo: string; pointsEarned: number } | null>(
@@ -65,13 +48,22 @@ function ShopPage() {
     enabled: Boolean(sessionToken),
   });
 
+  // 分類 tab 直接依商品的 sub_category（沒有 sub_category 時退回 category）動態產生。
+  const filters = useMemo(() => {
+    const groups = Array.from(
+      new Set((products ?? []).map((p) => p.sub_category ?? p.category)),
+    );
+    return [{ id: "all", label: "全部" }, ...groups.map((g) => ({ id: g, label: g }))];
+  }, [products]);
+
   const list = useMemo(
     () =>
-      (products ?? [])
-        .filter((p) => SHOP_CATEGORIES.includes(p.category))
-        .filter((p) => filter === "all" || p.category === filter),
+      (products ?? []).filter(
+        (p) => filter === "all" || (p.sub_category ?? p.category) === filter,
+      ),
     [products, filter],
   );
+
 
   const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
   const cartTotal = (products ?? []).reduce((sum, p) => sum + (cart[p.id] ?? 0) * p.price, 0);
@@ -136,7 +128,7 @@ function ShopPage() {
             <article key={p.id} className="surface-card flex flex-col p-5">
               <div className="overflow-hidden rounded-xl bg-accent">
                 <img
-                  src={PRODUCT_IMAGES[p.sku] ?? p.image_url ?? undefined}
+                  src={productImage(p.sku, p.image_url)}
                   alt={p.name}
                   loading="lazy"
                   width={768}
