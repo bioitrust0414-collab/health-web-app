@@ -14,11 +14,15 @@ export function useSessionToken() {
     if (isLiffConfigured()) {
       await ensureLiffLogin();
       const idToken = getLiffIdToken();
-      const { profileId, token } = await verifyLiffLogin({ data: idToken });
-      setStoredProfileId(profileId);
-      setStoredSessionToken(token);
-      return token;
+      const result = await verifyLiffLogin({ data: idToken });
+      if (result.needsVerification) {
+        throw new Error("請先到會員中心完成健檢會員身分驗證（姓名／生日／手機末 4 碼）。");
+      }
+      setStoredProfileId(result.profileId);
+      setStoredSessionToken(result.token);
+      return result.token;
     }
+
 
     const token = await issueDemoToken();
     setStoredSessionToken(token);
