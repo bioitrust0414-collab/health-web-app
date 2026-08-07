@@ -92,7 +92,7 @@ export function CartDrawer() {
                 <span>NT${totalPrice}</span>
               </div>
               <Link
-                to="/checkout"
+                to="/shop"
                 className="block w-full rounded-xl bg-emerald-600 py-3 text-center font-bold text-white transition hover:bg-emerald-700"
                 onClick={() => setIsOpen(false)}
               >

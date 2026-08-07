@@ -196,6 +196,7 @@ export function BookingSection() {
               </p>
               <Link
                 to="/member"
+                search={{ profileId: undefined, token: undefined }}
                 className="form-submit"
                 style={{
                   display: "inline-block",

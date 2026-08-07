@@ -96,9 +96,9 @@ export const reportFiles: ReportFile[] = [
   { id: "f3", title: "2025 年度全身健檢", clinic: "康悅健檢中心", date: "2025/07/09", itemCount: 58 },
 ];
 
-import fishOilImg from "@/assets/product-fishoil.jpg";
-import probioticImg from "@/assets/product-probiotic.jpg";
-import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
+import fishOilImg from "@/assets/hp-dha-fish-oil.jpg";
+import probioticImg from "@/assets/hp-cranberry-probiotic.jpg";
+import bpMonitorImg from "@/assets/hp-natto-q10.jpg";
 import checkupImg from "@/assets/service-checkup.jpg";
 import dietitianImg from "@/assets/service-dietitian.jpg";
 import coachingImg from "@/assets/service-coaching.jpg";
