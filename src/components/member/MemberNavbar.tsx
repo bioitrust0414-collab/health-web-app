@@ -32,7 +32,6 @@ export function MemberNavbar() {
             大華健康
           </Link>
 
-          {/* Desktop */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = location.pathname === item.to;
@@ -63,20 +62,14 @@ export function MemberNavbar() {
             </Button>
           </div>
 
-          {/* Mobile toggle */}
           <button
             className="md:hidden p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {mobileOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
 
-        {/* Mobile menu */}
         {mobileOpen && (
           <div className="md:hidden py-2 border-t">
             {navItems.map((item) => {
@@ -87,9 +80,7 @@ export function MemberNavbar() {
                   key={item.to}
                   to={item.to}
                   className={`flex items-center gap-2 px-3 py-3 rounded-lg text-sm font-medium ${
-                    isActive
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-gray-600"
+                    isActive ? "bg-emerald-50 text-emerald-700" : "text-gray-600"
                   }`}
                   onClick={() => setMobileOpen(false)}
                 >
@@ -99,10 +90,7 @@ export function MemberNavbar() {
               );
             })}
             <button
-              onClick={() => {
-                logout();
-                setMobileOpen(false);
-              }}
+              onClick={() => { logout(); setMobileOpen(false); }}
               className="flex items-center gap-2 px-3 py-3 text-sm text-gray-500 w-full"
             >
               <LogOut className="h-4 w-4" />
