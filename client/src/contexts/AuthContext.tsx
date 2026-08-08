@@ -29,7 +29,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (liff.isReady && liff.isLoggedIn && liff.profile) {
-      setUser({ lineUserId: liff.profile.userId, displayName: liff.profile.displayName, pictureUrl: liff.profile.pictureUrl });
+      setUser({
+        lineUserId: liff.profile.userId,
+        displayName: liff.profile.displayName,
+        pictureUrl: liff.profile.pictureUrl,
+      });
     } else if (liff.isReady && !liff.isLoggedIn) {
       setUser(null);
     }
@@ -42,17 +46,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const res = await fetch(`/api/verify-patient/check?lineUserId=${user.lineUserId}`);
       const data = await res.json();
-      if (data.success && data.mapped) { setIsMapped(true); return true; }
-      setIsMapped(false); return false;
-    } catch { setIsMapped(false); return false; }
+      if (data.success && data.mapped) {
+        setIsMapped(true);
+        return true;
+      }
+      setIsMapped(false);
+      return false;
+    } catch {
+      setIsMapped(false);
+      return false;
+    }
   }, [user?.lineUserId]);
 
-  useEffect(() => { if (user?.lineUserId) checkMapping(); }, [user?.lineUserId, checkMapping]);
+  useEffect(() => {
+    if (user?.lineUserId) checkMapping();
+  }, [user?.lineUserId, checkMapping]);
 
   const login = useCallback(() => liff.login(), [liff]);
-  const logout = useCallback(() => { liff.logout(); setUser(null); setIsMapped(false); }, [liff]);
+  const logout = useCallback(() => {
+    liff.logout();
+    setUser(null);
+    setIsMapped(false);
+  }, [liff]);
 
-  return <AuthContext.Provider value={{ user, isLoggedIn: !!user, isMapped, isLoading, error, login, logout, checkMapping }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoggedIn: !!user,
+        isMapped,
+        isLoading,
+        error,
+        login,
+        logout,
+        checkMapping,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth(): AuthContextType {
