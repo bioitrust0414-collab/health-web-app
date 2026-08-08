@@ -1,9 +1,3 @@
-// ============================================
-// 大華醫事檢驗所 - 共用型別定義
-// ============================================
-
-// --- 會員相關 ---
-
 export interface Profile {
   id: string;
   line_user_id: string;
@@ -17,12 +11,10 @@ export interface Profile {
 export interface PatientMapping {
   id: string;
   profile_id: string;
-  patient_id: string;        // LIS 系統的病患編號
+  patient_id: string;
   referral_source_id?: string;
   created_at: string;
 }
-
-// --- 檢驗報告 ---
 
 export interface Report {
   id: string;
@@ -35,29 +27,25 @@ export interface Report {
 }
 
 export interface ReportItem {
-  name: string;              // 檢驗項目名稱
-  value: number | string;    // 數值
-  unit: string;              // 單位
-  reference_min?: number;    // 參考值下限
-  reference_max?: number;    // 參考值上限
-  is_abnormal?: boolean;     // 是否異常
+  name: string;
+  value: number | string;
+  unit: string;
+  reference_min?: number;
+  reference_max?: number;
+  is_abnormal?: boolean;
 }
-
-// --- 預約 ---
 
 export interface Booking {
   id: string;
   patient_id: string;
   plan_id: string;
   referral_source_id?: string;
-  appointment_date: string;  // YYYY-MM-DD
-  appointment_time: string;  // HH:mm
+  appointment_date: string;
+  appointment_time: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   notes?: string;
   created_at: string;
 }
-
-// --- 訂單 ---
 
 export interface Order {
   id: string;
@@ -78,8 +66,6 @@ export interface OrderItem {
   quantity: number;
 }
 
-// --- 檢驗方案 ---
-
 export interface Plan {
   id: string;
   name: string;
@@ -90,8 +76,6 @@ export interface Plan {
   created_at: string;
 }
 
-// --- 診所/通路 ---
-
 export interface ReferralSource {
   id: string;
   name: string;
@@ -100,8 +84,6 @@ export interface ReferralSource {
   phone?: string;
   is_active: boolean;
 }
-
-// --- 提醒 ---
 
 export interface Reminder {
   id: string;
@@ -112,8 +94,6 @@ export interface Reminder {
   is_read: boolean;
   created_at: string;
 }
-
-// --- 每日紀錄 ---
 
 export interface DailyLog {
   id: string;
@@ -128,11 +108,9 @@ export interface DailyLog {
   created_at: string;
 }
 
-// --- LIS 驗證 ---
-
 export interface LISVerifyRequest {
   phone: string;
-  birthDate: string;         // YYYY-MM-DD
+  birthDate: string;
 }
 
 export interface LISVerifyResponse {
@@ -141,8 +119,6 @@ export interface LISVerifyResponse {
   name?: string;
   message?: string;
 }
-
-// --- API 回應 ---
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
