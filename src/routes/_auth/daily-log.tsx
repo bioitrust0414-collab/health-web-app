@@ -81,10 +81,7 @@ function DailyLogPage() {
                 placeholder="例如：今天感覺精神不錯..."
               />
             </div>
-            <Button
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
+            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
               儲存記錄
             </Button>
           </form>
