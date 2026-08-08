@@ -16,9 +16,7 @@ const verifyLineLogin = createServerFn({ method: "POST" })
     return idToken;
   })
   .handler(async ({ data: idToken }) => {
-    const { upsertProfileForLineUser } = await import(
-      "@/lib/lineAuth.server"
-    );
+    const { upsertProfileForLineUser } = await import("@/lib/lineAuth.server");
     return upsertProfileForLineUser(idToken);
   });
 
@@ -75,9 +73,7 @@ function LiffEntryPage() {
         }
       } catch (err) {
         console.error("LIFF entry error:", err);
-        setError(
-          err instanceof Error ? err.message : "LINE 登入失敗"
-        );
+        setError(err instanceof Error ? err.message : "LINE 登入失敗");
       }
     };
 
