@@ -1,30 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, ShoppingCart } from "lucide-react";
+import { Check, ChevronDown, Plus, ShoppingCart } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { BookButton } from "@/components/BookButton";
 import { getProducts, createOrder, getMemberDashboard } from "@/lib/memberActions.server";
 import { useSessionToken } from "@/lib/useSessionToken";
 import { getStoredSessionToken } from "@/lib/memberSession";
+import { packages, type Package } from "@/data/dahua";
+import { Link } from "@tanstack/react-router";
 import fishOilImg from "@/assets/product-fishoil.jpg";
 import probioticImg from "@/assets/product-probiotic.jpg";
 import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
-import checkupImg from "@/assets/service-checkup.jpg";
-import dietitianImg from "@/assets/service-dietitian.jpg";
-import coachingImg from "@/assets/service-coaching.jpg";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "健康商城｜保健品與健檢方案線上購買" },
+      { title: "健康商城｜保健品與健檢套組線上預約" },
       {
         name: "description",
-        content: "線上選購魚油、益生菌、藍牙血壓計等保健商品，並預約全身健檢、營養師諮詢與控糖課程。",
+        content: "線上選購魚油、益生菌、藍牙血壓計等保健商品，並直接預約 DH 系列健檢套組。",
       },
-      { property: "og:title", content: "健康商城｜保健品與健檢方案線上購買" },
+      { property: "og:title", content: "健康商城｜保健品與健檢套組線上預約" },
       {
         property: "og:description",
-        content: "實體保健商品與健康服務方案一站購足，加入購物車即可結帳。",
+        content: "實體保健商品與 DH 健檢套組一站購足，商品加入購物車結帳、健檢套組線上預約。",
       },
     ],
   }),
@@ -36,9 +36,6 @@ const PRODUCT_IMAGES: Record<string, string> = {
   "fish-oil-90": fishOilImg,
   "probiotic-fiber-30d": probioticImg,
   "bp-monitor-bluetooth": bpMonitorImg,
-  "checkup-full-body": checkupImg,
-  "dietitian-1on1": dietitianImg,
-  "glucose-coaching-12wk": coachingImg,
 };
 
 const filters = [
@@ -70,7 +67,10 @@ function ShopPage() {
   });
 
   const list = useMemo(
-    () => (products ?? []).filter((p) => filter === "all" || p.category === filter),
+    () =>
+      (products ?? [])
+        .filter((p) => p.category !== "service") // 健檢/服務類一律走「線上預約」而非購物車，跟 /tests 套組保持一致
+        .filter((p) => filter === "all" || p.category === filter),
     [products, filter],
   );
 
@@ -132,8 +132,11 @@ function ShopPage() {
           </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((p) => (
+        {filter === "service" ? (
+          <ServicePackages />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((p) => (
             <article key={p.id} className="surface-card flex flex-col p-5">
               <div className="overflow-hidden rounded-xl bg-accent">
                 <img
@@ -168,6 +171,7 @@ function ShopPage() {
             </article>
           ))}
         </div>
+        )}
       </div>
 
       {cartCount > 0 ? (
@@ -201,5 +205,64 @@ function ShopPage() {
         </div>
       ) : null}
     </AppShell>
+  );
+}
+
+// 服務方案：直接沿用 /tests 頁面同一份 DH 健檢套組資料（src/data/dahua.ts），
+// 確保商城顯示的方案跟官網健檢套組頁完全一致，不再是獨立虛構的服務項目。
+function ServicePackages() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {packages.general.map((pkg) => (
+        <ServicePackageCard key={pkg.id} pkg={pkg} />
+      ))}
+      <Link
+        to="/tests"
+        className="surface-card flex flex-col items-center justify-center gap-2 p-5 text-center text-sm font-bold text-primary"
+      >
+        查看完整健檢套組與比較表
+        <span className="text-xs font-medium text-muted-foreground">
+          含特定族群、基因檢測、過敏原檢測
+        </span>
+      </Link>
+    </div>
+  );
+}
+
+function ServicePackageCard({ pkg }: { pkg: Package }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <article className="surface-card flex flex-col p-5">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-accent text-xl">
+          {pkg.icon}
+        </span>
+        <p className="min-w-0 text-sm font-bold">{pkg.name}</p>
+      </div>
+      <p className="mt-3 flex-1 text-xs leading-relaxed text-muted-foreground">{pkg.desc}</p>
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="mt-3 flex items-center gap-1 text-xs font-bold text-primary"
+      >
+        {open ? "收起檢驗項目" : `查看 ${pkg.items.length} 項檢驗內容`}
+        <ChevronDown className={`h-3.5 w-3.5 transition ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <ul className="mt-3 grid gap-1.5 rounded-2xl bg-secondary p-3">
+          {pkg.items.map((item) => (
+            <li key={item} className="flex gap-2 text-xs">
+              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+              <span className="min-w-0">{item}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <BookButton packageName={pkg.name} bookingType="checkup" />
+    </article>
   );
 }

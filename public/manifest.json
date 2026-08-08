@@ -1,6 +1,6 @@
 {
-  "name": "健康好夥伴｜大華健康會員",
-  "short_name": "健康好夥伴",
+  "name": "大華醫學健康站",
+  "short_name": "大華醫學健康站",
   "description": "大華醫事檢驗所會員專區：檢驗報告、健康商城、點數與集點卡，支援 LINE 登入。",
   "start_url": "/health",
   "scope": "/",

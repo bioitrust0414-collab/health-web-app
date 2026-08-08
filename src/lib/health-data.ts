@@ -99,9 +99,6 @@ export const reportFiles: ReportFile[] = [
 import fishOilImg from "@/assets/product-fishoil.jpg";
 import probioticImg from "@/assets/product-probiotic.jpg";
 import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
-import checkupImg from "@/assets/service-checkup.jpg";
-import dietitianImg from "@/assets/service-dietitian.jpg";
-import coachingImg from "@/assets/service-coaching.jpg";
 
 export type Product = {
   id: string;
@@ -117,7 +114,4 @@ export const products: Product[] = [
   { id: "p1", name: "魚油 Omega-3 90 粒", detail: "高濃度 EPA/DHA，血脂偏高首選", price: 980, kind: "physical", tag: "熱銷", image: fishOilImg },
   { id: "p2", name: "膳食纖維益生菌", detail: "30 日份，餐前沖泡", price: 760, kind: "physical", tag: "回購率高", image: probioticImg },
   { id: "p3", name: "藍牙血壓計", detail: "自動同步 App 紀錄", price: 2280, kind: "physical", tag: "裝置", image: bpMonitorImg },
-  { id: "p4", name: "全身健檢方案", detail: "含 62 項檢查與醫師解說", price: 12800, kind: "service", tag: "可預約", image: checkupImg },
-  { id: "p5", name: "營養師 1 對 1 諮詢", detail: "50 分鐘線上諮詢，含飲食計畫", price: 1500, kind: "service", tag: "線上", image: dietitianImg },
-  { id: "p6", name: "12 週控糖課程", detail: "每週任務＋教練追蹤", price: 5600, kind: "service", tag: "訂閱", image: coachingImg },
 ];

@@ -29,11 +29,11 @@ export function AppShell({
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary-foreground/20 text-lg font-bold">
-                康
+                大
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold tracking-wide opacity-90">
-                  康活健康 KanLife
+                  大華醫學健康站
                 </p>
                 <p className="truncate text-xs opacity-70">
                   {isInClient ? "LINE 內開啟" : "網頁版"}

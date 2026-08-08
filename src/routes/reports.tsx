@@ -7,12 +7,12 @@ import { labResults, reportFiles } from "@/lib/health-data";
 export const Route = createFileRoute("/reports")({
   head: () => ({
     meta: [
-      { title: "健檢報告與趨勢｜康活健康" },
+      { title: "健檢報告與趨勢｜大華醫學健康站" },
       {
         name: "description",
         content: "檢視血糖、血脂、血壓等健檢數值與近五次趨勢變化，並下載歷年健檢報告檔案。",
       },
-      { property: "og:title", content: "健檢報告與趨勢｜康活健康" },
+      { property: "og:title", content: "健檢報告與趨勢｜大華醫學健康站" },
       {
         property: "og:description",
         content: "健檢數值一目了然，附參考範圍、狀態標示與歷年報告下載。",

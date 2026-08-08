@@ -57,7 +57,7 @@ const getMemberData = createServerFn({ method: "GET" })
 export const Route = createFileRoute("/member")({
   head: () => ({
     meta: [
-      { title: "會員資料與健檢報告｜康活健康" },
+      { title: "會員資料與健檢報告｜大華醫學健康站" },
       {
         name: "description",
         content: "查看會員基本資料與歷次健檢報告，支援 LINE 登入。",
