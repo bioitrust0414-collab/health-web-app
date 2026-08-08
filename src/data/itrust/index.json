@@ -1,0 +1,17 @@
+{
+  "repo": "iTrust_Repo",
+  "brand": "Rotciv 的生活手札543",
+  "total_episodes": 36,
+  "released_episodes": 1,
+  "episodes": [
+    {
+      "episode_number": 1,
+      "title": "礦物質科普：鐵與鈣",
+      "category": "礦物質科普",
+      "content_type": "科普",
+      "hook": "鐵質：氧氣運輸與預防疲倦；鈣質：顧骨本與穩定神經肌肉",
+      "folder": "ep01",
+      "has_content": true
+    }
+  ]
+}
