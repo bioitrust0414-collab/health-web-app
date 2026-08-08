@@ -18,9 +18,7 @@ function RemindersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">提醒管理</h1>
-        <p className="text-gray-500">
-          設定健康相關提醒，透過 LINE 接收通知
-        </p>
+        <p className="text-gray-500">設定健康相關提醒，透過 LINE 接收通知</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -80,9 +78,7 @@ function RemindersPage() {
       <Card>
         <CardContent className="py-8 text-center">
           <p className="text-gray-500">更多提醒功能開發中</p>
-          <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700">
-            新增自定義提醒
-          </Button>
+          <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700">新增自定義提醒</Button>
         </CardContent>
       </Card>
     </div>
