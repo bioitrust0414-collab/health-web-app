@@ -1,5 +1,6 @@
-import { useAuth } from './contexts/AuthContext.js';
-import Home from './pages/Home.js';
-import LiffEntry from './pages/LiffEntry.js';
-import LiffVerify from './pages/LiffVerify.js';
-import Dashboard from './pages/Dashboard.js';
+import { Route, Switch } from 'wouter';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Home from './pages/Home';
+import LiffEntry from './pages/LiffEntry';
+import LiffVerify from './pages/LiffVerify';
+import Dashboard from './pages/Dashboard';
