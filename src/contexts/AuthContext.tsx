@@ -4,12 +4,11 @@ import {
   useState,
   useEffect,
   useCallback,
-  ReactNode,
+  type ReactNode,
 } from "react";
 import {
   getStoredProfileId,
   setStoredProfileId,
-  clearStoredProfileId,
 } from "@/lib/memberSession";
 import { createServerFn } from "@tanstack/react-start";
 
@@ -33,6 +32,8 @@ const checkPatientMapping = createServerFn({ method: "GET" })
 // ── Types ──
 interface AuthUser {
   profileId: string;
+  displayName?: string;
+  pictureUrl?: string;
 }
 
 interface AuthState {
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isLoading: false,
           });
         } catch {
-          clearStoredProfileId();
+          localStorage.removeItem("dahua_member_profile_id");
           setState({
             user: null,
             isAuthenticated: false,
@@ -106,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    clearStoredProfileId();
+    localStorage.removeItem("dahua_member_profile_id");
     setState({
       user: null,
       isAuthenticated: false,
@@ -116,13 +117,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ ...state, setUser, setVerified, logout }}>
+    <AuthContext.Provider
+      value={{ ...state, setUser, setVerified, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
