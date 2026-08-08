@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, FileHeart, FlaskConical, ShoppingBag } from "lucide-react";
+import { ArrowRight, Bell, FileHeart, FlaskConical, NotebookPen, ShoppingBag } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { StepsChart } from "@/components/StepsChart";
@@ -32,6 +32,8 @@ const quickLinks = [
   { to: "/tests", label: "檢驗套組", desc: "瀏覽並預約", icon: FlaskConical },
   { to: "/shop", label: "健康商城", desc: "保健品選購", icon: ShoppingBag },
   { to: "/reports", label: "報告趨勢", desc: "數值變化", icon: FileHeart },
+  { to: "/daily-log", label: "健康日誌", desc: "記錄今天", icon: NotebookPen },
+  { to: "/reminders", label: "提醒管理", desc: "回診/習慣", icon: Bell },
 ] as const;
 
 function HealthPage() {

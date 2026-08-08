@@ -217,6 +217,147 @@ export const getMemberDashboard = createServerFn({ method: "GET" })
   });
 
 // ------------------------------------------------------------------
+// 健康日誌（daily_logs）
+// ------------------------------------------------------------------
+interface DailyLogRow {
+  id: string;
+  log_date: string;
+  water_ml: number;
+  sleep_hours: number | null;
+  notes: string | null;
+  created_at: string;
+}
+
+interface DailyLogInput {
+  sessionToken: string;
+  logDate: string; // YYYY-MM-DD
+  waterMl: number;
+  sleepHours?: number;
+  notes?: string;
+}
+
+export const getDailyLogs = createServerFn({ method: "GET" })
+  .validator((sessionToken: unknown) => {
+    if (typeof sessionToken !== "string" || sessionToken.length === 0) {
+      throw new Error("sessionToken is required");
+    }
+    return sessionToken;
+  })
+  .handler(async ({ data: sessionToken }) => {
+    const { verifySessionToken } = await import("./sessionToken");
+    const { restGetList } = await import("./supabaseAdmin");
+    const profileId = await verifySessionToken(sessionToken);
+
+    return restGetList<DailyLogRow>(
+      "daily_logs",
+      `profile_id=eq.${profileId}&order=log_date.desc&limit=14`,
+    );
+  });
+
+export const upsertDailyLog = createServerFn({ method: "POST" })
+  .validator((data: unknown) => data as DailyLogInput)
+  .handler(async ({ data }) => {
+    const { verifySessionToken } = await import("./sessionToken");
+    const { restGetOne, restInsert, restPatch } = await import("./supabaseAdmin");
+    const profileId = await verifySessionToken(data.sessionToken);
+
+    // 一天一筆：若當天已有紀錄則更新，否則新增
+    const existing = await restGetOne<{ id: string }>(
+      "daily_logs",
+      `profile_id=eq.${profileId}&log_date=eq.${data.logDate}`,
+    );
+
+    const payload = {
+      water_ml: data.waterMl,
+      sleep_hours: data.sleepHours ?? null,
+      notes: data.notes ?? null,
+    };
+
+    if (existing) {
+      await restPatch("daily_logs", `id=eq.${existing.id}`, payload);
+      return { id: existing.id, updated: true };
+    }
+
+    const [row] = await restInsert<DailyLogRow>("daily_logs", {
+      profile_id: profileId,
+      log_date: data.logDate,
+      ...payload,
+    });
+    return { id: row?.id, updated: false };
+  });
+
+// ------------------------------------------------------------------
+// 提醒事項（reminders）
+// ------------------------------------------------------------------
+interface ReminderRow {
+  id: string;
+  type: "FOLLOW_UP" | "HABIT" | "BOOKING";
+  title: string;
+  message: string;
+  trigger_time: string;
+  is_sent: boolean;
+  disclaimer_text: string;
+}
+
+interface ReminderInput {
+  sessionToken: string;
+  type: "FOLLOW_UP" | "HABIT" | "BOOKING";
+  title: string;
+  message: string;
+  triggerTime: string; // ISO datetime
+}
+
+const REMINDER_DISCLAIMER = "此提醒僅供個人健康管理參考，非醫療建議，如有不適請洽專業醫療人員。";
+
+export const getReminders = createServerFn({ method: "GET" })
+  .validator((sessionToken: unknown) => {
+    if (typeof sessionToken !== "string" || sessionToken.length === 0) {
+      throw new Error("sessionToken is required");
+    }
+    return sessionToken;
+  })
+  .handler(async ({ data: sessionToken }) => {
+    const { verifySessionToken } = await import("./sessionToken");
+    const { restGetList } = await import("./supabaseAdmin");
+    const profileId = await verifySessionToken(sessionToken);
+
+    return restGetList<ReminderRow>(
+      "reminders",
+      `profile_id=eq.${profileId}&order=trigger_time.asc&limit=50`,
+    );
+  });
+
+export const createReminder = createServerFn({ method: "POST" })
+  .validator((data: unknown) => data as ReminderInput)
+  .handler(async ({ data }) => {
+    const { verifySessionToken } = await import("./sessionToken");
+    const { restInsert } = await import("./supabaseAdmin");
+    const profileId = await verifySessionToken(data.sessionToken);
+
+    const [row] = await restInsert<ReminderRow>("reminders", {
+      profile_id: profileId,
+      type: data.type,
+      title: data.title,
+      message: data.message,
+      trigger_time: data.triggerTime,
+      is_sent: false,
+      disclaimer_text: REMINDER_DISCLAIMER,
+    });
+    return { id: row?.id };
+  });
+
+export const markReminderDone = createServerFn({ method: "POST" })
+  .validator((data: unknown) => data as { sessionToken: string; reminderId: string })
+  .handler(async ({ data }) => {
+    const { verifySessionToken } = await import("./sessionToken");
+    const { restPatch } = await import("./supabaseAdmin");
+    const profileId = await verifySessionToken(data.sessionToken);
+    // 帶上 profile_id 條件，避免用他人的 reminderId 誤改到別人的資料
+    await restPatch("reminders", `id=eq.${data.reminderId}&profile_id=eq.${profileId}`, { is_sent: true });
+    return { ok: true };
+  });
+
+// ------------------------------------------------------------------
 // 內部工具
 // ------------------------------------------------------------------
 async function awardPoints(
