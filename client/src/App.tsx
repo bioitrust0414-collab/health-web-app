@@ -31,18 +31,21 @@ function Router() {
         <RequireAuth><Dashboard /></RequireAuth>
       </Route>
       <Route path="/reports">
-        <RequireAuth><div className="p-8 text-center">報告頁面（開發中）</div></RequireAuth>
+        <RequireAuth><div className="p-8 text-center">報告列表（開發中）</div></RequireAuth>
       </Route>
       <Route path="/booking">
-        <RequireAuth><div className="p-8 text-center">預約頁面（開發中）</div></RequireAuth>
+        <RequireAuth><div className="p-8 text-center">預約掛號（開發中）</div></RequireAuth>
       </Route>
       <Route path="/orders">
-        <RequireAuth><div className="p-8 text-center">訂單頁面（開發中）</div></RequireAuth>
+        <RequireAuth><div className="p-8 text-center">訂單查詢（開發中）</div></RequireAuth>
+      </Route>
+      <Route path="/daily-log">
+        <RequireAuth><div className="p-8 text-center">健康日誌（開發中）</div></RequireAuth>
       </Route>
       <Route>
         <div className="min-h-screen flex flex-col items-center justify-center">
           <h1 className="text-4xl font-bold mb-4">404</h1>
-          <a href="/" className="text-primary hover:underline">返回首頁</a>
+          <a href="/" className="text-primary hover:underline">回首頁</a>
         </div>
       </Route>
     </Switch>
