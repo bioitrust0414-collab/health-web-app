@@ -96,22 +96,5 @@ export const reportFiles: ReportFile[] = [
   { id: "f3", title: "2025 年度全身健檢", clinic: "康悅健檢中心", date: "2025/07/09", itemCount: 58 },
 ];
 
-import fishOilImg from "@/assets/product-fishoil.jpg";
-import probioticImg from "@/assets/product-probiotic.jpg";
-import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
-
-export type Product = {
-  id: string;
-  name: string;
-  detail: string;
-  price: number;
-  kind: "physical" | "service";
-  tag: string;
-  image: string;
-};
-
-export const products: Product[] = [
-  { id: "p1", name: "魚油 Omega-3 90 粒", detail: "高濃度 EPA/DHA，血脂偏高首選", price: 980, kind: "physical", tag: "熱銷", image: fishOilImg },
-  { id: "p2", name: "膳食纖維益生菌", detail: "30 日份，餐前沖泡", price: 760, kind: "physical", tag: "回購率高", image: probioticImg },
-  { id: "p3", name: "藍牙血壓計", detail: "自動同步 App 紀錄", price: 2280, kind: "physical", tag: "裝置", image: bpMonitorImg },
-];
+// 商品資料已隨商城一併移除：保健品銷售改由外部購物平台承接，
+// 本站只保留導流連結（見 src/data/externalLinks.ts）。

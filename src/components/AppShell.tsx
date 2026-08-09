@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Activity, CreditCard, FlaskConical, ShoppingBag } from "lucide-react";
+import { Activity, CreditCard, FlaskConical } from "lucide-react";
 import { useLiffEnvironment } from "@/lib/use-liff";
 
+// 商城已移出本站，改由外部購物平台承接（見 src/data/externalLinks.ts）。
 const navItems = [
   { to: "/health", label: "健康首頁", icon: Activity },
   { to: "/tests", label: "檢驗套組", icon: FlaskConical },
-  { to: "/shop", label: "健康商城", icon: ShoppingBag },
   { to: "/member", label: "會員卡", icon: CreditCard },
 ] as const;
 
@@ -65,7 +65,7 @@ export function AppShell({
       <main className="mx-auto -mt-6 max-w-5xl px-5 md:px-8">{children}</main>
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-md grid-cols-4">
+        <div className="mx-auto grid max-w-md grid-cols-3">
           {navItems.map((item) => (
             <Link
               key={item.to}

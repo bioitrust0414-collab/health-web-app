@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Bell, FileHeart, FlaskConical, NotebookPen, ShoppingBag } from "lucide-react";
+import { Bell, FileHeart, FlaskConical, NotebookPen } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { StepsChart } from "@/components/StepsChart";
 import { LineOaCard } from "@/components/LineOaCard";
-import { dailyMetrics, labResults, products } from "@/lib/health-data";
+import { dailyMetrics, labResults } from "@/lib/health-data";
 
 export const Route = createFileRoute("/health")({
   head: () => ({
@@ -12,12 +12,12 @@ export const Route = createFileRoute("/health")({
       { title: "健康首頁｜大華健康 App" },
       {
         name: "description",
-        content: "手機版健康儀表板：步數、睡眠、心率、體重與健康分數，並可直接前往檢驗套組與健康商城。",
+        content: "手機版健康儀表板：步數、睡眠、心率、體重與健康分數，並可直接前往檢驗套組與健康日誌。",
       },
       { property: "og:title", content: "健康首頁｜大華健康 App" },
       {
         property: "og:description",
-        content: "一站式檢視個人健康數據、健檢趨勢與健康商城。",
+        content: "一站式檢視個人健康數據與健檢趨勢。",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -30,7 +30,6 @@ const healthScore = 82;
 
 const quickLinks = [
   { to: "/tests", label: "檢驗套組", desc: "瀏覽並預約", icon: FlaskConical },
-  { to: "/shop", label: "健康商城", desc: "保健品選購", icon: ShoppingBag },
   { to: "/reports", label: "報告趨勢", desc: "數值變化", icon: FileHeart },
   { to: "/daily-log", label: "健康日誌", desc: "記錄今天", icon: NotebookPen },
   { to: "/reminders", label: "提醒管理", desc: "回診/習慣", icon: Bell },
@@ -112,31 +111,6 @@ function HealthPage() {
 
         <LineOaCard />
 
-        <section className="surface-card p-5 md:p-8">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-            <h2 className="min-w-0 truncate text-base font-bold">為你推薦</h2>
-            <Link to="/shop" className="flex shrink-0 items-center gap-1 text-xs font-bold text-primary">
-              健康商城 <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {products.slice(0, 2).map((p) => (
-              <Link key={p.id} to="/shop" className="flex items-center gap-3 rounded-2xl bg-secondary p-3">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  loading="lazy"
-                  className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">{p.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{p.detail}</p>
-                  <p className="mt-0.5 text-sm font-bold text-primary tabular-nums">NT$ {p.price}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
       </div>
     </AppShell>
   );
