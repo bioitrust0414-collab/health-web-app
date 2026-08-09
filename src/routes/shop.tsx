@@ -12,6 +12,13 @@ import { Link } from "@tanstack/react-router";
 import fishOilImg from "@/assets/product-fishoil.jpg";
 import probioticImg from "@/assets/product-probiotic.jpg";
 import bpMonitorImg from "@/assets/product-bpmonitor.jpg";
+import bbSlimDrinkImg from "@/assets/product-bb-slim-drink.jpg";
+import bioidDhaFishoilImg from "@/assets/product-bioid-dha-fishoil.jpg";
+import bioidNattoQ10Img from "@/assets/product-bioid-nattokinase-q10.jpg";
+import malGrowthCalciumImg from "@/assets/product-mal-growth-calcium.jpg";
+import malNightEnzymeImg from "@/assets/product-mal-night-enzyme.jpg";
+import malVitalityMetabolismImg from "@/assets/product-mal-vitality-metabolism.jpg";
+import malCranberryProbioticsImg from "@/assets/product-mal-cranberry-probiotics.jpg";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -36,6 +43,13 @@ const PRODUCT_IMAGES: Record<string, string> = {
   "fish-oil-90": fishOilImg,
   "probiotic-fiber-30d": probioticImg,
   "bp-monitor-bluetooth": bpMonitorImg,
+  "bioid-bb-slim-drink": bbSlimDrinkImg,
+  "bioid-dha-fishoil": bioidDhaFishoilImg,
+  "bioid-natto-q10": bioidNattoQ10Img,
+  "mal-growth-calcium": malGrowthCalciumImg,
+  "mal-night-enzyme": malNightEnzymeImg,
+  "mal-vitality-metabolism": malVitalityMetabolismImg,
+  "mal-cranberry-probiotics": malCranberryProbioticsImg,
 };
 
 const filters = [
