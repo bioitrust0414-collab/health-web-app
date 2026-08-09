@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { LineOaCard } from "@/components/LineOaCard";
 import { MemberCard } from "@/components/MemberCard";
-import { StampCard } from "@/components/StampCard";
 
 import { ensureLiffLogin, getLiffIdToken, isLiffConfigured } from "@/lib/liffClient";
 import { setStoredProfileId, setStoredSessionToken, getStoredSessionToken } from "@/lib/memberSession";
@@ -204,7 +203,7 @@ function MemberPage() {
     <AppShell title={profile.full_name ?? "會員資料"} subtitle={loginSourceLabel[auth.source]}>
       <div className="grid gap-5 pb-8 lg:grid-cols-2">
         <div className="grid gap-5">
-          <MemberCard points={dashboard?.points} />
+          <MemberCard />
           <section className="surface-card p-5 md:p-8">
             <h2 className="text-base font-bold">會員資料</h2>
             <p className="mt-1 text-xs text-muted-foreground">{profile.email ?? "—"}</p>
@@ -216,7 +215,6 @@ function MemberPage() {
               <Field label="地址" value={profile.address} className="col-span-2" />
             </div>
           </section>
-          <StampCard stamps={dashboard?.stamps} stampGoal={dashboard?.stampGoal} />
           <LineOaCard />
         </div>
 
@@ -236,26 +234,6 @@ function MemberPage() {
                     </p>
                   </div>
                   <BookingStatusBadge status={booking.status} />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="surface-card overflow-hidden">
-            <h2 className="px-5 pt-5 text-base font-bold md:px-8">我的訂單</h2>
-            <div className="mt-2 divide-y divide-border">
-              {(!dashboard || dashboard.orders.length === 0) && (
-                <p className="px-5 py-4 text-sm text-muted-foreground md:px-8">目前沒有訂單紀錄。</p>
-              )}
-              {dashboard?.orders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between gap-3 px-5 py-3 md:px-8">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">{order.order_no}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      NT$ {order.final_amount.toLocaleString()} ・獲得 {order.points_earned} 點
-                    </p>
-                  </div>
-                  <OrderStatusBadge status={order.status} />
                 </div>
               ))}
             </div>
@@ -326,24 +304,6 @@ function BookingStatusBadge({ status }: { status: string }) {
   return (
     <span className="shrink-0 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
       {bookingStatusLabel[status] ?? status}
-    </span>
-  );
-}
-
-const orderStatusLabel: Record<string, string> = {
-  pending: "待付款",
-  paid: "已付款",
-  processing: "處理中",
-  shipped: "已出貨",
-  completed: "已完成",
-  cancelled: "已取消",
-  refunded: "已退款",
-};
-
-function OrderStatusBadge({ status }: { status: string }) {
-  return (
-    <span className="shrink-0 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-      {orderStatusLabel[status] ?? status}
     </span>
   );
 }

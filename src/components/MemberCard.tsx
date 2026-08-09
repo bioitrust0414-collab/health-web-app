@@ -2,24 +2,17 @@ import { member } from "@/lib/member-data";
 
 const barWidths = [2, 4, 1, 3, 2, 5, 1, 2, 4, 2, 3, 1, 4, 2, 1, 3, 5, 2, 1, 4, 2, 3, 1, 2, 4, 1, 3, 2];
 
-export function MemberCard({ points }: { points?: number | undefined } = {}) {
-  const displayPoints = points ?? member.points;
+export function MemberCard() {
   return (
     <section className="surface-card overflow-hidden">
       <div className="brand-gradient shadow-brand px-5 py-6 text-primary-foreground md:px-8">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary-foreground/25 text-lg font-bold">
-              {member.avatarInitial}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-lg font-bold">{member.name}</p>
-              <p className="text-xs opacity-85">{member.tier}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xs opacity-80">可用點數</p>
-            <p className="text-2xl font-bold tabular-nums">{displayPoints.toLocaleString()}</p>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary-foreground/25 text-lg font-bold">
+            {member.avatarInitial}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate text-lg font-bold">{member.name}</p>
+            <p className="text-xs opacity-85">{member.tier}</p>
           </div>
         </div>
 
