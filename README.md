@@ -35,7 +35,7 @@ bun run dev
 | `bun run format` | Prettier |
 
 > ⚠️ `bun run lint` 目前會報約 8,500 個 CRLF 換行錯誤，是既有的換行符設定
-> 問題，**不要隨手跑 `--fix`**（會重寫整個 repo）。細節見 ROADMAP 項目 9。
+> 問題，**不要隨手跑 `--fix`**（會重寫整個 repo）。細節見 ROADMAP 項目 10。
 
 ## 環境變數
 
