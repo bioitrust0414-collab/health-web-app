@@ -1,5 +1,5 @@
 // src/lib/memberActions.server.ts
-// SERVER-ONLY. Booking / shop / points / stamp-card writes and reads.
+// SERVER-ONLY. Booking / daily-log / reminder writes and reads.
 //
 // Every call here takes a `sessionToken` (see sessionToken.ts), never a bare
 // profileId — the token is verified first, and the profileId used for every
@@ -7,12 +7,14 @@
 // caller passed in. Combined with supabaseAdmin (service role, bypasses
 // RLS), this means the only way to act as a member is to actually be
 // carrying a token that member's login issued.
+//
+// 商城／訂單／點數／集點卡已於本次收斂中移除（保健品銷售改由外部購物平台
+// 承接）。orders / order_items / member_points / stamp_cards / products 五張表
+// 仍保留在 db/schema_extension.sql 中作為未來的資料模型開口，但沒有任何
+// server function 可以寫入它們 —— 這是刻意的：留 schema，不留可被呼叫的端點。
+// 若日後要復工，復工前必須先修的項目見 docs/ROADMAP.md。
 
 import { createServerFn } from "@tanstack/react-start";
-
-const STAMP_GOAL = 10;
-const POINTS_PER_BOOKING = 50;
-const POINTS_PER_100_SPENT = 1; // 1 point per NT$100 spent (after point redemption), rounded down
 
 interface BookingRow {
   id: string;
@@ -20,26 +22,6 @@ interface BookingRow {
   package_name: string;
   status: "pending" | "confirmed" | "completed" | "cancelled";
   created_at: string;
-}
-
-interface OrderRow {
-  id: string;
-  order_no: string;
-  status: string;
-  final_amount: number;
-  points_earned: number;
-  created_at: string;
-}
-
-interface StampCardRow {
-  id: string;
-  current_stamps: number;
-  total_stamps: number;
-  is_completed: boolean;
-}
-
-interface PointsBalanceRow {
-  total_points: number;
 }
 
 // ------------------------------------------------------------------
@@ -93,100 +75,11 @@ export const createBooking = createServerFn({ method: "POST" })
     });
     if (!booking) throw new Error("建立預約失敗");
 
-    await awardPoints(profileId, POINTS_PER_BOOKING, "booking", booking.id, "預約健檢/諮詢");
-    await bumpStampCard(profileId);
-
     return { bookingId: booking.id };
   });
 
 // ------------------------------------------------------------------
-// 商城 / 訂單
-// ------------------------------------------------------------------
-interface CartItemInput {
-  productId: string;
-  name: string;
-  unitPrice: number;
-  quantity: number;
-}
-
-interface OrderInput {
-  sessionToken: string;
-  items: CartItemInput[];
-  pointsToUse: number;
-}
-
-export const createOrder = createServerFn({ method: "POST" })
-  .validator((data: unknown) => data as OrderInput)
-  .handler(async ({ data }) => {
-    const { verifySessionToken } = await import("./sessionToken");
-    const { restInsert, restGetOne } = await import("./supabaseAdmin");
-    const profileId = await verifySessionToken(data.sessionToken);
-
-    if (!data.items.length) throw new Error("購物車是空的");
-
-    const totalAmount = data.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-
-    const balance = await restGetOne<PointsBalanceRow>(
-      "member_points_balance",
-      `profile_id=eq.${profileId}`,
-    );
-    const availablePoints = balance?.total_points ?? 0;
-    const pointsUsed = Math.max(0, Math.min(data.pointsToUse, availablePoints, Math.floor(totalAmount)));
-    const finalAmount = totalAmount - pointsUsed;
-    const pointsEarned = Math.floor(finalAmount / 100) * POINTS_PER_100_SPENT;
-    const orderNo = `DH${Date.now()}`;
-
-    const [order] = await restInsert<{ id: string; order_no: string }>("orders", {
-      profile_id: profileId,
-      order_no: orderNo,
-      status: "pending",
-      total_amount: totalAmount,
-      points_used: pointsUsed,
-      points_earned: pointsEarned,
-      final_amount: finalAmount,
-      payment_method: "pending_gateway", // 尚未接金流，見 README 待辦事項
-    });
-    if (!order) throw new Error("建立訂單失敗");
-
-    await restInsert(
-      "order_items",
-      data.items.map((item) => ({
-        order_id: order.id,
-        product_id: item.productId,
-        product_name: item.name,
-        unit_price: item.unitPrice,
-        quantity: item.quantity,
-        subtotal: item.unitPrice * item.quantity,
-      })),
-    );
-
-    if (pointsUsed > 0) {
-      await awardPoints(profileId, -pointsUsed, "purchase", order.id, `訂單 ${orderNo} 折抵`);
-    }
-    if (pointsEarned > 0) {
-      await awardPoints(profileId, pointsEarned, "purchase", order.id, `訂單 ${orderNo} 消費回饋`);
-    }
-
-    return { orderId: order.id, orderNo: order.order_no, finalAmount, pointsEarned, pointsUsed };
-  });
-
-export const getProducts = createServerFn({ method: "GET" }).handler(async () => {
-  const { restGetList } = await import("./supabaseAdmin");
-  return restGetList<{
-    id: string;
-    sku: string;
-    name: string;
-    category: string;
-    description: string | null;
-    price: number;
-    original_price: number | null;
-    image_url: string | null;
-    stock_quantity: number;
-  }>("products", "is_active=eq.true&order=category.asc,created_at.desc");
-});
-
-// ------------------------------------------------------------------
-// 會員儀表板：預約 / 訂單 / 點數 / 集點卡
+// 會員儀表板：預約紀錄
 // ------------------------------------------------------------------
 export const getMemberDashboard = createServerFn({ method: "GET" })
   .validator((sessionToken: unknown) => {
@@ -197,23 +90,15 @@ export const getMemberDashboard = createServerFn({ method: "GET" })
   })
   .handler(async ({ data: sessionToken }) => {
     const { verifySessionToken } = await import("./sessionToken");
-    const { restGetList, restGetOne } = await import("./supabaseAdmin");
+    const { restGetList } = await import("./supabaseAdmin");
     const profileId = await verifySessionToken(sessionToken);
 
-    const [bookings, orders, pointsBalance, stampCard] = await Promise.all([
-      restGetList<BookingRow>("bookings", `profile_id=eq.${profileId}&order=created_at.desc&limit=10`),
-      restGetList<OrderRow>("orders", `profile_id=eq.${profileId}&order=created_at.desc&limit=10`),
-      restGetOne<PointsBalanceRow>("member_points_balance", `profile_id=eq.${profileId}`),
-      restGetOne<StampCardRow>("stamp_cards", `profile_id=eq.${profileId}&card_type=eq.default`),
-    ]);
+    const bookings = await restGetList<BookingRow>(
+      "bookings",
+      `profile_id=eq.${profileId}&order=created_at.desc&limit=10`,
+    );
 
-    return {
-      bookings,
-      orders,
-      points: pointsBalance?.total_points ?? 0,
-      stamps: stampCard?.current_stamps ?? 0,
-      stampGoal: stampCard?.total_stamps ?? STAMP_GOAL,
-    };
+    return { bookings };
   });
 
 // ------------------------------------------------------------------
@@ -356,49 +241,3 @@ export const markReminderDone = createServerFn({ method: "POST" })
     await restPatch("reminders", `id=eq.${data.reminderId}&profile_id=eq.${profileId}`, { is_sent: true });
     return { ok: true };
   });
-
-// ------------------------------------------------------------------
-// 內部工具
-// ------------------------------------------------------------------
-async function awardPoints(
-  profileId: string,
-  points: number,
-  source: string,
-  sourceId: string,
-  description: string,
-): Promise<void> {
-  const { restInsert } = await import("./supabaseAdmin");
-  await restInsert("member_points", {
-    profile_id: profileId,
-    transaction_type: points >= 0 ? "earn" : "redeem",
-    points,
-    source,
-    source_id: sourceId,
-    description,
-  });
-}
-
-async function bumpStampCard(profileId: string): Promise<void> {
-  const { restGetOne, restPatch, restInsert } = await import("./supabaseAdmin");
-  const existing = await restGetOne<{ id: string; current_stamps: number; total_stamps: number }>(
-    "stamp_cards",
-    `profile_id=eq.${profileId}&card_type=eq.default`,
-  );
-
-  if (!existing) {
-    await restInsert("stamp_cards", {
-      profile_id: profileId,
-      card_type: "default",
-      current_stamps: 1,
-      total_stamps: STAMP_GOAL,
-    });
-    return;
-  }
-
-  const nextStamps = Math.min(existing.current_stamps + 1, existing.total_stamps);
-  await restPatch("stamp_cards", `id=eq.${existing.id}`, {
-    current_stamps: nextStamps,
-    is_completed: nextStamps >= existing.total_stamps,
-    completed_at: nextStamps >= existing.total_stamps ? new Date().toISOString() : null,
-  });
-}

@@ -10,16 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DailyLogRouteImport } from './routes/daily-log'
 import { Route as HealthRouteImport } from './routes/health'
 import { Route as MemberRouteImport } from './routes/member'
+import { Route as RemindersRouteImport } from './routes/reminders'
 import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as ShopRouteImport } from './routes/shop'
 import { Route as TestsRouteImport } from './routes/tests'
 import { Route as AuthLineCallbackRouteImport } from './routes/auth.line.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DailyLogRoute = DailyLogRouteImport.update({
+  id: '/daily-log',
+  path: '/daily-log',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthRoute = HealthRouteImport.update({
@@ -32,14 +38,14 @@ const MemberRoute = MemberRouteImport.update({
   path: '/member',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RemindersRoute = RemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShopRoute = ShopRouteImport.update({
-  id: '/shop',
-  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TestsRoute = TestsRouteImport.update({
@@ -55,29 +61,32 @@ const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/daily-log': typeof DailyLogRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
+  '/reminders': typeof RemindersRoute
   '/reports': typeof ReportsRoute
-  '/shop': typeof ShopRoute
   '/tests': typeof TestsRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/daily-log': typeof DailyLogRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
+  '/reminders': typeof RemindersRoute
   '/reports': typeof ReportsRoute
-  '/shop': typeof ShopRoute
   '/tests': typeof TestsRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/daily-log': typeof DailyLogRoute
   '/health': typeof HealthRoute
   '/member': typeof MemberRoute
+  '/reminders': typeof RemindersRoute
   '/reports': typeof ReportsRoute
-  '/shop': typeof ShopRoute
   '/tests': typeof TestsRoute
   '/auth/line/callback': typeof AuthLineCallbackRoute
 }
@@ -85,38 +94,42 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/daily-log'
     | '/health'
     | '/member'
+    | '/reminders'
     | '/reports'
-    | '/shop'
     | '/tests'
     | '/auth/line/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/daily-log'
     | '/health'
     | '/member'
+    | '/reminders'
     | '/reports'
-    | '/shop'
     | '/tests'
     | '/auth/line/callback'
   id:
     | '__root__'
     | '/'
+    | '/daily-log'
     | '/health'
     | '/member'
+    | '/reminders'
     | '/reports'
-    | '/shop'
     | '/tests'
     | '/auth/line/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DailyLogRoute: typeof DailyLogRoute
   HealthRoute: typeof HealthRoute
   MemberRoute: typeof MemberRoute
+  RemindersRoute: typeof RemindersRoute
   ReportsRoute: typeof ReportsRoute
-  ShopRoute: typeof ShopRoute
   TestsRoute: typeof TestsRoute
   AuthLineCallbackRoute: typeof AuthLineCallbackRoute
 }
@@ -128,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/daily-log': {
+      id: '/daily-log'
+      path: '/daily-log'
+      fullPath: '/daily-log'
+      preLoaderRoute: typeof DailyLogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health': {
@@ -144,18 +164,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MemberRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reminders': {
+      id: '/reminders'
+      path: '/reminders'
+      fullPath: '/reminders'
+      preLoaderRoute: typeof RemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reports': {
       id: '/reports'
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shop': {
-      id: '/shop'
-      path: '/shop'
-      fullPath: '/shop'
-      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tests': {
@@ -177,10 +197,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DailyLogRoute: DailyLogRoute,
   HealthRoute: HealthRoute,
   MemberRoute: MemberRoute,
+  RemindersRoute: RemindersRoute,
   ReportsRoute: ReportsRoute,
-  ShopRoute: ShopRoute,
   TestsRoute: TestsRoute,
   AuthLineCallbackRoute: AuthLineCallbackRoute,
 }

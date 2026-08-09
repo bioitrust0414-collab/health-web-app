@@ -1,16 +1,15 @@
 import { useState } from "react";
+import { educationLink, linkAttrs, type ExternalLink } from "@/data/externalLinks";
 
-const links = [
-  { href: "#checkups", label: "健康檢查" },
-  { href: "#gene", label: "基因檢測" },
-  { href: "#specialized", label: "專項檢驗" },
-  { href: "#products", label: "保健產品" },
-  { href: "/education", label: "衛教知識" },
-  { href: "/mal1688", label: "專業複合鈣" },
-  { href: "/heychew1688/index.html", label: "寵物零嘴" },
-  { href: "/health", label: "健康 App" },
-  { href: "/member", label: "會員登入" },
-
+// 保健食品與寵物零嘴的入口已自本站移除：大華是醫事檢驗所（醫療機構），
+// 在醫療機構網域上推薦食品商品的法規風險偏高，商品線改為完全獨立經營。
+const links: ExternalLink[] = [
+  { href: "#checkups", label: "健康檢查", isExternal: false },
+  { href: "#gene", label: "基因檢測", isExternal: false },
+  { href: "#specialized", label: "專項檢驗", isExternal: false },
+  educationLink,
+  { href: "/health", label: "健康 App", isExternal: false },
+  { href: "/member", label: "會員登入", isExternal: false },
 ];
 
 export function Navbar() {
@@ -29,7 +28,7 @@ export function Navbar() {
         </a>
         <div className={`nav-links${open ? " active" : ""}`}>
           {links.map((l) => (
-            <a key={l.href} href={l.href} onClick={close}>
+            <a key={l.href} {...linkAttrs(l)} onClick={close}>
               {l.label}
             </a>
           ))}

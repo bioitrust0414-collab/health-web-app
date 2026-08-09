@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "大華醫學健康站" },
-      { name: "description", content: "大華醫事檢驗所會員專區：檢驗報告、健康商城、點數與集點卡，支援 LINE 登入。" },
+      { name: "description", content: "大華醫事檢驗所會員專區：健檢預約與檢驗報告查詢，支援 LINE 登入。" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#059669" },
