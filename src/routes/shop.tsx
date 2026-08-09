@@ -43,13 +43,13 @@ const PRODUCT_IMAGES: Record<string, string> = {
   "fish-oil-90": fishOilImg,
   "probiotic-fiber-30d": probioticImg,
   "bp-monitor-bluetooth": bpMonitorImg,
-  "bioid-bb-slim-drink": bbSlimDrinkImg,
-  "bioid-dha-fishoil": bioidDhaFishoilImg,
-  "bioid-natto-q10": bioidNattoQ10Img,
-  "mal-growth-calcium": malGrowthCalciumImg,
-  "mal-night-enzyme": malNightEnzymeImg,
-  "mal-vitality-metabolism": malVitalityMetabolismImg,
-  "mal-cranberry-probiotics": malCranberryProbioticsImg,
+  "bb-vitality-drink": bbSlimDrinkImg,
+  "dha": bioidDhaFishoilImg,
+  "natto-q10": bioidNattoQ10Img,
+  "growth-calcium": malGrowthCalciumImg,
+  "night-enzyme": malNightEnzymeImg,
+  "vitality-metabolism": malVitalityMetabolismImg,
+  "cranberry-probiotics": malCranberryProbioticsImg,
 };
 
 const filters = [
