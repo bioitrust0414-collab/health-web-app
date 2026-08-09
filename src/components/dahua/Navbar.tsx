@@ -1,20 +1,13 @@
 import { useState } from "react";
-import {
-  educationLink,
-  linkAttrs,
-  petTreatsLink,
-  supplementsLink,
-  type ExternalLink,
-} from "@/data/externalLinks";
+import { educationLink, linkAttrs, type ExternalLink } from "@/data/externalLinks";
 
+// 保健食品與寵物零嘴的入口已自本站移除：大華是醫事檢驗所（醫療機構），
+// 在醫療機構網域上推薦食品商品的法規風險偏高，商品線改為完全獨立經營。
 const links: ExternalLink[] = [
   { href: "#checkups", label: "健康檢查", isExternal: false },
   { href: "#gene", label: "基因檢測", isExternal: false },
   { href: "#specialized", label: "專項檢驗", isExternal: false },
-  { href: "#products", label: "保健產品", isExternal: false },
   educationLink,
-  supplementsLink,
-  petTreatsLink,
   { href: "/health", label: "健康 App", isExternal: false },
   { href: "/member", label: "會員登入", isExternal: false },
 ];

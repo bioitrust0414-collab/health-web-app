@@ -15,6 +15,7 @@
 **範圍內**
 
 - 首頁形象站（健檢、基因檢測、專項檢驗、衛教、預約）
+  - 商品區塊（保健食品、寵物零嘴）已完全移除，見「凍結項目 → 商品線導流」
 - LINE LIFF 登入 + session token
 - 健檢／諮詢預約（`createBooking`）
 - 會員專區的預約紀錄查詢
@@ -54,6 +55,19 @@
   `security_invoker = off`，會**繞過底層表的 RLS**。若 Supabase 預設把
   SELECT 權限 grant 給 `anon`，任何人都能讀到全部會員的點數餘額。復工前
   必須實測確認，或改為 `security_invoker = on`。
+
+### 商品線導流（保健食品 / 寵物零嘴）
+
+首頁的「健康保健產品」區塊（`ProductsSection`）與導覽列的「保健產品」
+「專業複合鈣」「寵物零嘴」三個入口已**完全移除**。MAL 好家庭 / bio+id
+與 Paludo & Mila 兩條商品線改為完全獨立經營，不從本站導流。
+
+**理由**：大華是醫事檢驗所（醫療機構）。在醫療機構網域上推薦食品商品，
+即使只是連結導出，商品敘述仍出現在醫療機構的頁面上，是法規上最敏感的
+組合（食安法 §28 禁止食品涉及療效宣稱，醫療機構為商品背書另有界線）。
+
+**若日後要恢復導流**：設定加回 `src/data/externalLinks.ts`，不要把網址
+散落在元件裡。恢復前建議先請診所法務／顧問確認呈現方式與文案。
 
 ### 檢驗報告串接（LIS）
 
@@ -134,12 +148,21 @@ channel secret，目前 `.env.example` 裡還沒有這個變數，需一併補�
 基準」「精準引導鈣質沉積」等語句改為中性描述，但正式上線前建議由診所
 法務／顧問確認一次。
 
-### 8. ⚪ 外部商品連結目前是 404
+### 8. ⚪ 衛教知識 `/education` 路由不存在
 
-`src/data/externalLinks.ts` 中的 `/mal1688`、`/heychew1688/index.html`、
-`/education` 三個目標，在本 repo 的**任何分支上都不存在**。歷史上曾有
-`src/routes/mal1688.tsx` 與 `src/routes/education.*.tsx`，但已被刪除。
-需確認各產品線的最終網址後回填。
+首頁 `EducationSection` 的文章卡片連到 `/education/ep01`、底部按鈕連到
+`/education`，但**這兩個路由在本 repo 的任何分支上都不存在**（歷史上有過
+`src/routes/education.index.tsx` 與 `education.$slug.tsx`，已被刪除），
+點下去都是 404。
+
+內容現況：`src/data/itrust/index.json` 規劃 36 篇，**實際只有 1 篇有內容**
+（ep01「礦物質科普：鐵與鈣」，圖片在 `public/content/itrust/episodes/ep01/`）。
+
+待決定：補回路由上線這 1 篇，或先移除首頁入口、等內容累積到一定數量再上。
+內容檔案不論哪個選項都應保留。
+
+> 保健食品與寵物零嘴的入口已於本次收斂中完全移除（見下方變更紀錄），
+> 因此原本的 `/mal1688`、`/heychew1688` 兩個 404 連結已不存在。
 
 ### 9. ⚪ 全 repo 換行符與 prettier 設定衝突
 
