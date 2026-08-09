@@ -164,7 +164,20 @@ channel secret，目前 `.env.example` 裡還沒有這個變數，需一併補�
 > 保健食品與寵物零嘴的入口已於本次收斂中完全移除（見下方變更紀錄），
 > 因此原本的 `/mal1688`、`/heychew1688` 兩個 404 連結已不存在。
 
-### 9. ⚪ 全 repo 換行符與 prettier 設定衝突
+### 9. ⚪ Service worker 快取會延長「舊版殘影」
+
+`public/sw.js` 對 `.css`、圖片、字型採 cache-first，而 `CACHE_NAME` 寫死為
+`health-app-shell-v1`，`activate` 只會刪掉「名稱不同」的舊快取 —— 也就是說
+除非有人手動改版本號，快取永遠不會失效。
+
+正式環境的資源檔名帶 hash，新版本等於新網址，所以通常不會拿到舊檔；但在
+裝過 PWA 的裝置上，這仍會讓部署後的舊畫面比預期更久才消失。曾實際造成
+困擾：一次部署延遲期間，站上看到的是已從程式碼移除的功能。
+
+**建議**：把 `CACHE_NAME` 綁到建置版本（例如注入 build id），或改為
+stale-while-revalidate。排查時請使用者清除網站資料即可立即恢復。
+
+### 10. ⚪ 全 repo 換行符與 prettier 設定衝突
 
 `npx eslint src` 會報約 8,500 個 `Delete ␍`（CRLF）錯誤，全部是既有問題。
 **不要隨手跑 `--fix`**，那會重寫每一個檔案、產生無法 review 的巨大 diff。
