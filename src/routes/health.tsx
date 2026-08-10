@@ -1,83 +1,53 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-export const Route = createFileRoute("/health")({
-  component: HealthPage,
-});
+import { Navbar } from "@/components/dahua/Navbar";
+import { Footer } from "@/components/dahua/Footer";
 
 const LINE_OA_URL = "https://lin.ee/NCshL6k";
 const LINE_PWA_URL = "https://liff.line.me/2010848952-VfGV0qlc";
 
+export const Route = createFileRoute("/health")({
+  head: () => ({
+    meta: [{ title: "健康服務中心 - 大華醫事檢驗所" }],
+  }),
+  component: HealthPage,
+});
+
 function HealthPage() {
   const actions = [
-    {
-      title: "會員登錄",
-      desc: "使用 LINE 帳號快速登入，查看檢驗報告與預約紀錄",
-      href: LINE_OA_URL,
-      external: true,
-      primary: true,
-    },
-    {
-      title: "健康 App",
-      desc: "開啟 LINE 會員應用，追蹤每日健康數據",
-      href: LINE_PWA_URL,
-      external: true,
-      primary: true,
-    },
-    {
-      title: "健檢預約",
-      desc: "線上預約健檢項目，選擇方便時段",
-      href: "/booking",
-      external: false,
-      primary: false,
-    },
-    {
-      title: "衛教知識",
-      desc: "瀏覽營養科普與健康資訊",
-      href: "/health-education",
-      external: false,
-      primary: false,
-    },
-    {
-      title: "聯繫我們",
-      desc: "透過 LINE 官方帳號諮詢",
-      href: LINE_OA_URL,
-      external: true,
-      primary: false,
-    },
+    { title: "會員登錄", desc: "使用 LINE 帳號快速登入", href: LINE_OA_URL, external: true },
+    { title: "健康 App", desc: "開啟 LINE 會員應用", href: LINE_PWA_URL, external: true },
+    { title: "健檢預約", desc: "線上預約健檢項目", href: "/booking", external: false },
+    { title: "衛教知識", desc: "瀏覽營養科普與健康資訊", href: "/health-education", external: false },
+    { title: "聯繫我們", desc: "透過 LINE 官方帳號諮詢", href: LINE_OA_URL, external: true },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gray-100 py-10 px-4 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">健康服務中心</h1>
-        <p className="text-gray-600 text-sm">大華醫事檢驗所 — 您的健康管理夥伴</p>
-      </div>
+    <>
+      <Navbar />
+      <main style={{ paddingTop: "80px", minHeight: "100vh", background: "#f8fafc" }}>
+        <section style={{ textAlign: "center", padding: "48px 16px" }}>
+          <div className="section-badge">Health Center</div>
+          <h2 className="section-title">健康服務中心</h2>
+          <p className="section-desc">大華醫事檢驗所 — 您的健康管理夥伴</p>
+        </section>
 
-      <div className="max-w-xl mx-auto px-4 py-8">
-        <div className="space-y-4">
-          {actions.map((action) => (
-            <Card key={action.title} className="border border-gray-200">
-              <CardContent className="p-5">
-                <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
-                <p className="text-sm text-gray-500 mb-4">{action.desc}</p>
+        <div className="container" style={{ maxWidth: "640px", margin: "0 auto", padding: "0 16px 48px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {actions.map((action) => (
+              <div key={action.title} className="product-card" style={{ padding: "24px" }}>
+                <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: "8px" }}>{action.title}</h3>
+                <p style={{ color: "#64748b", fontSize: "0.875rem", marginBottom: "16px" }}>{action.desc}</p>
                 {action.external ? (
-                  <Button asChild className={action.primary ? "" : "variant-outline"}>
-                    <a href={action.href} target="_blank" rel="noopener noreferrer">
-                      開啟 →
-                    </a>
-                  </Button>
+                  <a href={action.href} target="_blank" rel="noopener noreferrer" className="btn-primary">開啟 →</a>
                 ) : (
-                  <Button asChild variant={action.primary ? "default" : "outline"}>
-                    <a href={action.href}>進入</a>
-                  </Button>
+                  <a href={action.href} className="btn-primary">進入 →</a>
                 )}
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 }
