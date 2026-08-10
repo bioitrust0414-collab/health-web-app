@@ -2,11 +2,8 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, BookOpen, Bone, Heart, Stethoscope, Pill } from "lucide-react";
+import { BookOpen, Bone, Heart, Stethoscope, Pill, Brain } from "lucide-react";
 
-// ============================================
-// 衛教文章資料
-// ============================================
 const healthTopics = [
   {
     id: "active-calcium",
@@ -16,19 +13,15 @@ const healthTopics = [
     summary:
       "活性鈣採用離子化技術，吸收率較傳統碳酸鈣提升約 40%。適合骨質疏鬆高風險群、孕期與哺乳期女性補充。",
     tags: ["鈣質", "骨質疏鬆", "孕期營養"],
-    externalUrl: "https://你的商店.com/active-calcium?ref=dahua",
-    hasProduct: true,
   },
   {
-    id: "pet-snacks",
+    id: "pet-health",
     category: "寵物保健",
     icon: <Heart className="w-5 h-5" />,
-    title: "寵物機能零食 — 關節保健配方",
+    title: "寵物營養與關節保健",
     summary:
-      "添加葡萄糖胺與軟骨素，幫助毛孩維持關節靈活。無穀物配方，適合敏感體質犬貓。",
-    tags: ["寵物", "關節保健", "無穀物"],
-    externalUrl: "https://你的商店.com/pet-snacks?ref=dahua",
-    hasProduct: true,
+      "毛孩的關節健康與日常營養補充建議。了解葡萄糖胺、軟骨素與適合的飲食搭配。",
+    tags: ["寵物", "關節保健", "營養"],
   },
   {
     id: "iron-deficiency",
@@ -38,8 +31,6 @@ const healthTopics = [
     summary:
       "鐵蛋白（Ferritin）是評估體內鐵質儲存的重要指標。了解如何透過飲食與檢驗追蹤改善。",
     tags: ["貧血", "鐵蛋白", "血液檢查"],
-    externalUrl: null,
-    hasProduct: false,
   },
   {
     id: "vitamin-d",
@@ -49,8 +40,24 @@ const healthTopics = [
     summary:
       "維生素 D 不僅影響鈣質吸收，更與免疫功能和情緒調節密切相關。建議定期檢測 25-OH-D 濃度。",
     tags: ["維生素D", "免疫", "情緒"],
-    externalUrl: null,
-    hasProduct: false,
+  },
+  {
+    id: "gut-health",
+    category: "腸道健康",
+    icon: <Brain className="w-5 h-5" />,
+    title: "腸道菌相與全身健康",
+    summary:
+      "腸道被稱為「第二大腦」。了解益生菌、膳食纖維與腸道屏障功能的關聯。",
+    tags: ["腸道", "益生菌", "免疫力"],
+  },
+  {
+    id: "sleep-quality",
+    category: "睡眠與神經",
+    icon: <Brain className="w-5 h-5" />,
+    title: "鎂與睡眠品質",
+    summary:
+      "鎂離子參與神經傳導與肌肉放鬆，適量補充有助於改善入睡困難與夜間醒來。",
+    tags: ["鎂", "睡眠", "神經"],
   },
 ];
 
@@ -73,8 +80,7 @@ export default function HealthEducationPage() {
             衛教知識
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            大華醫事檢驗所整理的健康資訊與營養知識。
-            點擊「前往選購」可至合作商店查看相關產品。
+            大華醫事檢驗所整理的健康資訊與營養知識，供會員參考。
           </p>
         </div>
       </section>
@@ -104,14 +110,9 @@ export default function HealthEducationPage() {
               className="hover:shadow-lg transition-shadow border-border/60"
             >
               <CardHeader className="pb-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    {topic.icon}
-                    <span className="text-sm font-medium">{topic.category}</span>
-                  </div>
-                  {topic.hasProduct && (
-                    <Badge variant="default">可選購</Badge>
-                  )}
+                <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                  {topic.icon}
+                  <span className="text-sm font-medium">{topic.category}</span>
                 </div>
                 <CardTitle className="text-xl leading-tight">
                   {topic.title}
@@ -123,31 +124,14 @@ export default function HealthEducationPage() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {topic.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs bg-muted px-2 py-1 rounded-md text-muted-foreground"
-                    >
-                      #{tag}
-                    </span>
+                    <Badge key={tag} variant="secondary">
+                      {tag}
+                    </Badge>
                   ))}
                 </div>
-                <div className="flex gap-3 pt-2">
-                  <Button variant="default" className="flex-1" asChild>
-                    <a href={`/health-topics/${topic.id}`}>閱讀完整內容</a>
-                  </Button>
-                  {topic.externalUrl && (
-                    <Button variant="outline" asChild>
-                      <a
-                        href={topic.externalUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-1" />
-                        前往選購
-                      </a>
-                    </Button>
-                  )}
-                </div>
+                <Button className="w-full" asChild>
+                  <a href={`/health-topics/${topic.id}`}>閱讀完整內容</a>
+                </Button>
               </CardContent>
             </Card>
           ))}
