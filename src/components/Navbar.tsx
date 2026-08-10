@@ -1,80 +1,79 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Stethoscope } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 
 const LINE_OA_URL = "https://lin.ee/NCshL6k";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = [
-    { label: "首頁", to: "/" },
-    { label: "衛教知識", to: "/health-education" },
-    { label: "健檢預約", to: "/booking" },
+    { label: "首頁", href: "/" },
+    { label: "衛教知識", href: "/health-education" },
+    { label: "健檢預約", href: "/booking" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-bold text-lg">
-          <Stethoscope className="h-5 w-5 text-primary" />
-          <span>大華醫檢</span>
-        </Link>
+    <header className="sticky top-0 z-50 w-full border-b bg-white">
+      <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+        {/* Logo */}
+        <a href="/" className="font-bold text-lg text-gray-900">
+          大華醫檢
+        </a>
 
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-              activeProps={{ className: "text-foreground font-semibold" }}
+            <a
+              key={item.href}
+              href={item.href}
+              className="text-sm text-gray-600 hover:text-gray-900"
             >
               {item.label}
-            </Link>
+            </a>
           ))}
+          <a
+            href={LINE_OA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+          >
+            會員登錄
+          </a>
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
-          <Button size="sm" asChild>
-            <a href={LINE_OA_URL} target="_blank" rel="noopener noreferrer">
-              會員登錄
-            </a>
-          </Button>
-        </div>
-
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-[280px]">
-            <div className="flex flex-col gap-6 mt-6">
-              {navItems.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setOpen(false)}
-                  className="text-base font-medium"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <hr />
-              <a
-                href={LINE_OA_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-base font-medium text-primary"
-              >
-                會員登錄 →
-              </a>
-            </div>
-          </SheetContent>
-        </Sheet>
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden p-2"
+          onClick={() => setMobileOpen(!mobileOpen)}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-t bg-white px-4 py-4 space-y-3">
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="block text-gray-700 py-1"
+              onClick={() => setMobileOpen(false)}
+            >
+              {item.label}
+            </a>
+          ))}
+          <a
+            href={LINE_OA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-blue-600 font-medium py-1"
+          >
+            會員登錄 →
+          </a>
+        </div>
+      )}
     </header>
   );
 }
