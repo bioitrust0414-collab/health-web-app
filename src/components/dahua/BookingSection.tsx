@@ -1,18 +1,28 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
 import { bookingOptions } from "@/data/dahua";
-import { getStoredProfileId } from "@/lib/memberSession";
-import { useSessionToken } from "@/lib/useSessionToken";
-import { createBooking } from "@/lib/memberActions.server";
+import { LINE_OA_ADD_FRIEND_URL, LINE_OA_ID, lineOaMessageUrl } from "@/data/externalLinks";
 import { SectionHeader } from "./SectionHeader";
+
+// 預約流程刻意不寫入資料庫，也不需要登入。
+//
+// 訪客填完表單後，我們把內容組成一則訊息帶進 LINE 官方帳號的輸入框，由
+// 訪客自己按傳送；門市在 LINE 收到訊息後人工跟進。這樣做的理由：
+//
+//  1. 本站不再保存任何個人資料 —— 姓名與電話只存在於訪客自己的 LINE 對話
+//     中，沒有伺服器端資料庫，也就沒有個資或病歷外洩的路徑。
+//  2. 免登入，訪客不必先加好友、不必授權，門檻最低。
+//  3. 對話留在 LINE，門市本來就在那裡回覆客戶，不必再開一套後台。
+//
+// 代價是預約紀錄不會自動彙整。若日後需要後台報表，再回頭接資料庫，屆時
+// 務必一併處理匿名寫入的防灌水機制。
 
 const contacts = [
   {
     icon: "💬",
     title: "LINE 官方帳號",
-    info: "@932cczax",
-    href: "https://line.me/ti/p/@932cczax",
-    cta: "立即加入 →",
+    info: LINE_OA_ID,
+    href: LINE_OA_ADD_FRIEND_URL,
+    cta: "加入好友 →",
     external: true,
   },
   {
@@ -33,53 +43,29 @@ const contacts = [
   },
 ];
 
+function buildMessage(form: { name: string; phone: string; pkg: string; note: string }) {
+  return [
+    "【大華醫事檢驗所 預約諮詢】",
+    `姓名：${form.name}`,
+    `電話：${form.phone}`,
+    `諮詢套組：${form.pkg}`,
+    `備註：${form.note}`,
+  ].join("\n");
+}
+
 export function BookingSection() {
-  const { getSessionToken } = useSessionToken();
   const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", phone: "", pkg: "", note: "" });
-  const [isMember, setIsMember] = useState(false);
 
-  useEffect(() => {
-    setIsMember(Boolean(getStoredProfileId()));
-  }, []);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    window.open(lineOaMessageUrl(buildMessage(form)), "_blank", "noopener,noreferrer");
+    setSent(true);
+  }
 
-    try {
-      // 登入（LIFF 或 demo）後才能真正寫入預約紀錄，未登入時 getSessionToken()
-      // 在 LIFF 環境下會直接跳轉到 LINE 登入頁。
-      const sessionToken = await getSessionToken();
-      await createBooking({
-        data: {
-          sessionToken,
-          bookingType: "consultation",
-          packageName: form.pkg,
-          contactName: form.name,
-          contactPhone: form.phone,
-          notes: form.note,
-        },
-      });
-      setIsMember(true);
-
-      // 同時用 LINE 訊息通知門市，方便人工立即跟進。
-      const msg = `【大華醫事檢驗所預約諮詢】\n姓名：${form.name}\n電話：${form.phone}\n諮詢套組：${form.pkg}\n備註：${form.note}`;
-      window.open(`https://line.me/R/oaMessage/@932cczax/?text=${encodeURIComponent(msg)}`, "_blank");
-
-      setSent(true);
-      window.setTimeout(() => {
-        setSent(false);
-        setForm({ name: "", phone: "", pkg: "", note: "" });
-      }, 4000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "預約送出失敗，請稍後再試。");
-    } finally {
-      setLoading(false);
-    }
+  function reset() {
+    setSent(false);
+    setForm({ name: "", phone: "", pkg: "", note: "" });
   }
 
   return (
@@ -91,48 +77,26 @@ export function BookingSection() {
           desc="歡迎透過以下方式與我們聯絡，或直接填寫預約表單。"
         />
         <div className="contact-grid">
-          {contacts.map((c) => {
-            // 已經登入過的會員點 LINE 官方帳號卡片，直接進會員專區看報告，
-            // 不用再走一次加好友的 QR code 流程。
-            if (c.title === "LINE 官方帳號" && isMember) {
-              return (
-                <div key={c.title} className="contact-card">
-                  <div className="contact-icon">{c.icon}</div>
-                  <div className="contact-title">{c.title}</div>
-                  <div className="contact-info">{c.info}</div>
-                  <Link to="/member" search={{ profileId: undefined, token: undefined }} className="contact-link">
-                    前往會員專區 →
-                  </Link>
-                </div>
-              );
-            }
-
-            return (
-              <div key={c.title} className="contact-card">
-                <div className="contact-icon">{c.icon}</div>
-                <div className="contact-title">{c.title}</div>
-                <div className="contact-info">{c.info}</div>
-                <a
-                  href={c.href}
-                  className="contact-link"
-                  {...(c.external ? { target: "_blank", rel: "noreferrer" } : {})}
-                >
-                  {c.cta}
-                </a>
-              </div>
-            );
-          })}
+          {contacts.map((c) => (
+            <div key={c.title} className="contact-card">
+              <div className="contact-icon">{c.icon}</div>
+              <div className="contact-title">{c.title}</div>
+              <div className="contact-info">{c.info}</div>
+              <a
+                href={c.href}
+                className="contact-link"
+                {...(c.external ? { target: "_blank", rel: "noreferrer" } : {})}
+              >
+                {c.cta}
+              </a>
+            </div>
+          ))}
         </div>
         <div className="booking-form-container">
           <h3 className="form-title">預約專業諮詢</h3>
           <p className="form-desc">
-            填寫以下資料並送出，預約會直接記錄在您的會員專區，我們也會於工作日 24 小時內與您聯繫確認。
+            填寫以下資料並送出，我們會透過 LINE 官方帳號與您聯繫確認。不需註冊或登入。
           </p>
-          {error && (
-            <p style={{ color: "#f87171", textAlign: "center", marginBottom: "16px", fontSize: "14px" }}>
-              {error}
-            </p>
-          )}
           {!sent ? (
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -175,15 +139,40 @@ export function BookingSection() {
                 onChange={(e) => setForm({ ...form, note: e.target.value })}
                 required
               />
-              <button type="submit" className="form-submit" disabled={loading}>
-                {loading ? "送出中..." : "送出預約"}
+              <button type="submit" className="form-submit">
+                透過 LINE 送出預約
               </button>
             </form>
           ) : (
             <div className="form-success">
-              <div className="success-icon">✓</div>
-              <div className="success-title">預約資料已成功送出</div>
-              <div className="success-desc">已記錄在您的會員專區，我們將盡快與您聯繫，感謝您的信任。</div>
+              <div className="success-icon">💬</div>
+              <div className="success-title">已為您開啟 LINE 對話</div>
+              <div className="success-desc">
+                預約內容已填入 LINE 的輸入框，<strong>請在 LINE 中按下傳送</strong>，我們才會收到。
+                若沒有自動跳轉，請點下方按鈕重新開啟。
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "12px",
+                  justifyContent: "center",
+                  marginTop: "20px",
+                }}
+              >
+                <a
+                  href={lineOaMessageUrl(buildMessage(form))}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="form-submit"
+                  style={{ width: "auto", padding: "12px 28px", display: "inline-block", textAlign: "center" }}
+                >
+                  重新開啟 LINE
+                </a>
+                <button type="button" onClick={reset} className="form-submit" style={{ width: "auto", padding: "12px 28px" }}>
+                  再填一筆
+                </button>
+              </div>
             </div>
           )}
         </div>
