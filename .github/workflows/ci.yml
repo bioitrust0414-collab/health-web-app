@@ -1,0 +1,53 @@
+name: CI
+
+# 為什麼需要這個檔案：
+#
+# 2026-08-10 曾發生一次 `src/routes/index.tsx` 被寫到一半就提交的意外 ——
+# 檔案截斷在 JSX 中間，`vite build` 直接失敗，而該 commit 一路推上 main
+# 都沒有任何機制擋下來。線上站當時看起來正常，只是因為 Vercel 還在服務
+# 上一版建置產物；下一次部署才會爆炸。
+#
+# 這個 workflow 就是那個「擋下來的機制」。它刻意只做兩件最基本的事，跑得
+# 快、沒有維護成本，但足以攔截「壓根無法建置」這一類錯誤。
+#
+# 註：lint 沒有納入，因為全 repo 有約 8,500 個既有的 CRLF 換行錯誤，會讓
+# CI 永遠是紅的（見 docs/ROADMAP.md 項目 10）。等換行符正規化完成後，再把
+# lint 加進來。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # 本專案以 bun.lock 為準（見 README）。--frozen-lockfile 確保 CI 裝的
+      # 版本與 lockfile 完全一致，也會在有人只改 package.json 沒更新
+      # bun.lock 時直接失敗。
+      - run: bun install --frozen-lockfile
+
+      - name: 型別檢查
+        run: bunx tsc --noEmit
+
+      # build 會順帶重新產生 src/routeTree.gen.ts。
+      - name: 建置
+        run: bun run build
+
+      # routeTree.gen.ts 是產生檔但有進版控。如果 build 後它變了，代表有人
+      # 新增或刪除路由卻忘了提交重新產生的版本 —— 這正是 /health-education
+      # 路由當初漏掉登錄、導致型別錯誤的原因。
+      - name: 檢查 routeTree.gen.ts 是否為最新
+        run: |
+          if ! git diff --quiet -- src/routeTree.gen.ts; then
+            echo "::error::src/routeTree.gen.ts 與路由檔不同步，請在本機執行 bun run build 後提交產生的檔案。"
+            git diff -- src/routeTree.gen.ts
+            exit 1
+          fi
