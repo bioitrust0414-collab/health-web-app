@@ -72,7 +72,6 @@ export default function HealthEducationPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
       <section className="bg-muted py-16 px-4">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           <BookOpen className="w-10 h-10 mx-auto text-primary" />
@@ -85,7 +84,6 @@ export default function HealthEducationPage() {
         </div>
       </section>
 
-      {/* Filter */}
       <section className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex flex-wrap gap-2 justify-center">
           {categories.map((cat) => (
@@ -101,7 +99,6 @@ export default function HealthEducationPage() {
         </div>
       </section>
 
-      {/* Cards */}
       <section className="max-w-5xl mx-auto px-4 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filtered.map((topic) => (
