@@ -2,36 +2,37 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Stethoscope } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
-// ← 請換成你的 LINE OA 真實網址
-const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號";
+const LINE_OA_URL = "https://lin.ee/NCshL6k";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   const navItems = [
-    { label: "首頁", href: "/" },
-    { label: "衛教知識", href: "/health-education" },
-    { label: "健檢預約", href: "/booking" },
+    { label: "首頁", to: "/" },
+    { label: "衛教知識", to: "/health-education" },
+    { label: "健檢預約", to: "/booking" },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
-        <a href="/" className="flex items-center gap-2 font-bold text-lg">
+        <Link to="/" className="flex items-center gap-2 font-bold text-lg">
           <Stethoscope className="h-5 w-5 text-primary" />
           <span>大華醫檢</span>
-        </a>
+        </Link>
 
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
+            <Link
+              key={item.to}
+              to={item.to}
               className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "text-foreground font-semibold" }}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -52,14 +53,14 @@ export default function Navbar() {
           <SheetContent side="right" className="w-[280px]">
             <div className="flex flex-col gap-6 mt-6">
               {navItems.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
+                <Link
+                  key={item.to}
+                  to={item.to}
                   onClick={() => setOpen(false)}
                   className="text-base font-medium"
                 >
                   {item.label}
-                </a>
+                </Link>
               ))}
               <hr />
               <a
