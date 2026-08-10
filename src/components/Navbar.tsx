@@ -40,4 +40,58 @@ export default function Navbar() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
-            <a href={LINE_O
+            <a href={LINE_OA_URL} target="_blank" rel="noopener noreferrer">
+              會員登錄
+            </a>
+          </Button>
+          <Button size="sm" asChild>
+            <a href={LINE_PWA_URL} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="w-4 h-4 mr-1" />
+              健康 App
+            </a>
+          </Button>
+        </div>
+
+        {/* Mobile Menu */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="icon">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[280px]">
+            <div className="flex flex-col gap-6 mt-6">
+              {navItems.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="text-base font-medium"
+                >
+                  {item.label}
+                </a>
+              ))}
+              <hr />
+              <a
+                href={LINE_OA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-base font-medium text-muted-foreground"
+              >
+                會員登錄 →
+              </a>
+              <a
+                href={LINE_PWA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-base font-medium text-primary"
+              >
+                健康 App →
+              </a>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </header>
+  );
+}
