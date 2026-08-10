@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { educationLink, linkAttrs, type ExternalLink } from "@/data/externalLinks";
 
-// 導覽項目分三種，因為它們的導航方式不同：
+// 導覽項目分兩種，因為它們的導航方式不同：
 //
 //  - hash   同頁錨點，用原生 <a>
 //  - route  站內路由，必須用 TanStack 的 <Link>，不能用 <a href="/xxx">
-//  - link   外部（或尚無路由的）連結，用 <a>，外部會自動帶 rel="noopener"
 //
-// 為什麼站內路由要用 <Link> 而不是 <a href="/health">：
+// 為什麼站內路由要用 <Link> 而不是 <a href="/health-education">：
 // 原生 <a> 會讓瀏覽器整頁重新載入 —— 重新下載並執行整包 JS、重跑
 // hydration、閃一下白畫面，而且 TanStack 的 history 索引（__TSR_index）
 // 會被重設為 0。改用 <Link> 之後是 client-side 轉場，速度快很多，也和
@@ -19,19 +17,18 @@ import { educationLink, linkAttrs, type ExternalLink } from "@/data/externalLink
 //
 // 保健食品與寵物零嘴的入口已自本站移除：大華是醫事檢驗所（醫療機構），
 // 在醫療機構網域上推薦食品商品的法規風險偏高，商品線改為完全獨立經營。
+//
+// 「健康 App」與「會員登入」兩個入口已隨會員系統一併移除：本站不再提供
+// 檢驗報告查詢與健康追蹤，預約諮詢改由 LINE 官方帳號承接。
 type NavItem =
   | { kind: "hash"; href: string; label: string }
-  | { kind: "route"; to: "/health" | "/member"; label: string }
-  | { kind: "link"; link: ExternalLink };
+  | { kind: "route"; to: "/health-education"; label: string };
 
 const navItems: NavItem[] = [
   { kind: "hash", href: "#checkups", label: "健康檢查" },
   { kind: "hash", href: "#gene", label: "基因檢測" },
   { kind: "hash", href: "#specialized", label: "專項檢驗" },
-  // /education 路由尚不存在，暫時維持一般連結（見 docs/ROADMAP.md 項目 8）
-  { kind: "link", link: educationLink },
-  { kind: "route", to: "/health", label: "健康 App" },
-  { kind: "route", to: "/member", label: "會員登入" },
+  { kind: "route", to: "/health-education", label: "衛教知識" },
 ];
 
 export function Navbar() {
@@ -55,13 +52,6 @@ export function Navbar() {
                 <Link key={item.to} to={item.to} onClick={close}>
                   {item.label}
                 </Link>
-              );
-            }
-            if (item.kind === "link") {
-              return (
-                <a key={item.link.href} {...linkAttrs(item.link)} onClick={close}>
-                  {item.link.label}
-                </a>
               );
             }
             return (
