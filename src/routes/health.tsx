@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import stylesCss from "@/styles.css?url";
 import dahuaCss from "@/styles/dahua.css?url";
 import { Navbar } from "@/components/dahua/Navbar";
 import { Footer } from "@/components/dahua/Footer";
@@ -11,10 +10,8 @@ const LINE_PWA_URL = "https://liff.line.me/2010848952-VfGV0qlc";
 export const Route = createFileRoute("/health")({
   head: () => ({
     meta: [{ title: "健康服務中心 - 大華醫事檢驗所" }],
-    links: [
-      { rel: "stylesheet", href: stylesCss },
-      { rel: "stylesheet", href: dahuaCss },
-    ],
+    // styles.css 由 __root.tsx 全域載入，這裡只補 dahua 形象站專用樣式
+    links: [{ rel: "stylesheet", href: dahuaCss }],
   }),
   component: HealthPage,
 });
