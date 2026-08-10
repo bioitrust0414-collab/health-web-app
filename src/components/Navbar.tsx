@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Stethoscope } from "lucide-react";
 
+// ← 請換成你的 LINE OA 真實網址
 const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號";
 
 export default function Navbar() {
