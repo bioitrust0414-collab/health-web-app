@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ExternalLink, Stethoscope } from "lucide-react";
+import { Menu, Stethoscope } from "lucide-react";
 
-const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號"; // ← 換成你的 LINE OA
-const LINE_PWA_URL = "https://liff.line.me/你的LIFF_ID";      // ← 換成你的 LIFF URL
+const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -18,13 +17,11 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
-        {/* Logo */}
         <a href="/" className="flex items-center gap-2 font-bold text-lg">
           <Stethoscope className="h-5 w-5 text-primary" />
           <span>大華醫檢</span>
         </a>
 
-        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-6">
           {navItems.map((item) => (
             <a
@@ -37,22 +34,14 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" asChild>
+          <Button size="sm" asChild>
             <a href={LINE_OA_URL} target="_blank" rel="noopener noreferrer">
               會員登錄
             </a>
           </Button>
-          <Button size="sm" asChild>
-            <a href={LINE_PWA_URL} target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="w-4 h-4 mr-1" />
-              健康 App
-            </a>
-          </Button>
         </div>
 
-        {/* Mobile Menu */}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon">
@@ -76,17 +65,9 @@ export default function Navbar() {
                 href={LINE_OA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-base font-medium text-muted-foreground"
-              >
-                會員登錄 →
-              </a>
-              <a
-                href={LINE_PWA_URL}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="text-base font-medium text-primary"
               >
-                健康 App →
+                會員登錄 →
               </a>
             </div>
           </SheetContent>
