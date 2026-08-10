@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import dahuaCss from "@/styles/dahua.css?url";
 import { Navbar } from "@/components/dahua/Navbar";
 import { Footer } from "@/components/dahua/Footer";
 import { SocialFab } from "@/components/dahua/SocialFab";
@@ -10,7 +9,6 @@ const LINE_PWA_URL = "https://liff.line.me/2010848952-VfGV0qlc";
 export const Route = createFileRoute("/health")({
   head: () => ({
     meta: [{ title: "健康服務中心 - 大華醫事檢驗所" }],
-    links: [{ rel: "stylesheet", href: dahuaCss }],
   }),
   component: HealthPage,
 });
@@ -34,24 +32,4 @@ function HealthPage() {
           <p className="section-desc">大華醫事檢驗所 — 您的健康管理夥伴</p>
         </section>
 
-        <div className="container" style={{ maxWidth: "640px", margin: "0 auto", padding: "0 16px 48px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {actions.map((action) => (
-              <div key={action.title} className="product-card" style={{ padding: "24px" }}>
-                <h3 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: "8px" }}>{action.title}</h3>
-                <p style={{ color: "#64748b", fontSize: "0.875rem", marginBottom: "16px" }}>{action.desc}</p>
-                {action.external ? (
-                  <a href={action.href} target="_blank" rel="noopener noreferrer" className="btn-primary">開啟 →</a>
-                ) : (
-                  <a href={action.href} className="btn-primary">進入 →</a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-      <Footer />
-      <SocialFab />
-    </>
-  );
-}
+        <div className="container" style={{ maxWidth: "640px", margin:
