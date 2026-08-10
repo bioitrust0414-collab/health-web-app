@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import dahuaCss from "@/styles/dahua.css?url";
 import { Navbar } from "@/components/dahua/Navbar";
 import { HeroSection } from "@/components/dahua/HeroSection";
 import { ClinicSection } from "@/components/dahua/ClinicSection";
@@ -11,6 +10,7 @@ import { EducationSection } from "@/components/dahua/EducationSection";
 import { BookingSection } from "@/components/dahua/BookingSection";
 import { Footer } from "@/components/dahua/Footer";
 import { SocialFab } from "@/components/dahua/SocialFab";
+// ❌ 移除: import dahuaCss from "@/styles/dahua.css?url";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
         content: "健康檢查、基因檢測、過敏原檢測與專業諮詢，數據實證的預防醫學夥伴。",
       },
     ],
-    links: [{ rel: "stylesheet", href: dahuaCss }],
+    // ❌ 移除: links: [{ rel: "stylesheet", href: dahuaCss }],
   }),
   component: Index,
 });
