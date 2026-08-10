@@ -19,15 +19,35 @@ export interface ExternalLink {
 }
 
 /**
+ * LINE 官方帳號
+ *
+ * 會員系統移除後，LINE 官方帳號是本站唯一的雙向溝通管道：訪客加好友後，
+ * 預約與諮詢都在 LINE 內由門市人工跟進。換官方帳號時只需改 LINE_OA_ID。
+ */
+export const LINE_OA_ID = "@932cczax";
+
+/** 加入好友頁 */
+export const LINE_OA_ADD_FRIEND_URL = `https://line.me/ti/p/${LINE_OA_ID}`;
+
+/**
+ * 開啟與官方帳號的對話框，並把 text 預先填入輸入框。
+ *
+ * 注意：這只是「把文字帶進訪客的輸入框」，**訪客仍必須自己按傳送**。
+ * 因此送出預約表單後畫面上要明確提示這一步，否則訪客會誤以為已經送出。
+ */
+export function lineOaMessageUrl(text: string): string {
+  return `https://line.me/R/oaMessage/${LINE_OA_ID}/?text=${encodeURIComponent(text)}`;
+}
+
+/**
  * 衛教內容
  *
- * ⚠️ /education 路由目前不存在（歷史上曾有 src/routes/education.*.tsx，
- * 已被刪除），首頁 EducationSection 的卡片與「瀏覽全部」按鈕都會 404。
- * 待決定：補回路由上線現有的 1 篇內容，或先移除入口。見 docs/ROADMAP.md。
+ * 站內路由 /health-education。歷史上曾指向不存在的 /education 而長期 404，
+ * 已於移除健康 App 時一併修正。
  */
 export const educationLink: ExternalLink = {
   label: "衛教知識",
-  href: "/education", // TODO: 補回 /education 路由，或改為外部內容站
+  href: "/health-education",
   isExternal: false,
 };
 
