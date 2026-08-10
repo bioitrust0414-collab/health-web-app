@@ -1,117 +1,112 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell, FileHeart, FlaskConical, NotebookPen } from "lucide-react";
-import { AppShell } from "@/components/AppShell";
-import { StatusBadge } from "@/components/StatusBadge";
-import { StepsChart } from "@/components/StepsChart";
-import { LineOaCard } from "@/components/LineOaCard";
-import { dailyMetrics, labResults } from "@/lib/health-data";
+import { createFileRoute } from "@tanstack/react-router";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  ExternalLink,
+  User,
+  Smartphone,
+  Calendar,
+  FileText,
+  MessageCircle,
+} from "lucide-react";
 
 export const Route = createFileRoute("/health")({
-  head: () => ({
-    meta: [
-      { title: "健康首頁｜大華健康 App" },
-      {
-        name: "description",
-        content: "手機版健康儀表板：步數、睡眠、心率、體重與健康分數，並可直接前往檢驗套組與健康日誌。",
-      },
-      { property: "og:title", content: "健康首頁｜大華健康 App" },
-      {
-        property: "og:description",
-        content: "一站式檢視個人健康數據與健檢趨勢。",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
   component: HealthPage,
 });
 
-const healthScore = 82;
-
-const quickLinks = [
-  { to: "/tests", label: "檢驗套組", desc: "瀏覽並預約", icon: FlaskConical },
-  { to: "/reports", label: "報告趨勢", desc: "數值變化", icon: FileHeart },
-  { to: "/daily-log", label: "健康日誌", desc: "記錄今天", icon: NotebookPen },
-  { to: "/reminders", label: "提醒管理", desc: "回診/習慣", icon: Bell },
-] as const;
+const LINE_OA_URL = "https://lin.ee/NCshL6k";
+const LINE_PWA_URL = "https://liff.line.me/2010848952-VfGV0qlc";
 
 function HealthPage() {
-  const watchList = labResults.filter((r) => r.status !== "normal");
+  const actions = [
+    {
+      title: "會員登錄",
+      desc: "使用 LINE 帳號快速登入，查看檢驗報告與預約紀錄",
+      icon: <User className="w-6 h-6" />,
+      href: LINE_OA_URL,
+      variant: "default" as const,
+      external: true,
+    },
+    {
+      title: "健康 App",
+      desc: "開啟 LINE 會員應用，追蹤每日健康數據",
+      icon: <Smartphone className="w-6 h-6" />,
+      href: LINE_PWA_URL,
+      variant: "default" as const,
+      external: true,
+    },
+    {
+      title: "健檢預約",
+      desc: "線上預約健檢項目，選擇方便時段",
+      icon: <Calendar className="w-6 h-6" />,
+      href: "/booking",
+      variant: "outline" as const,
+      external: false,
+    },
+    {
+      title: "衛教知識",
+      desc: "瀏覽營養科普與健康資訊",
+      icon: <FileText className="w-6 h-6" />,
+      href: "/health-education",
+      variant: "outline" as const,
+      external: false,
+    },
+    {
+      title: "聯繫我們",
+      desc: "透過 LINE 官方帳號諮詢",
+      icon: <MessageCircle className="w-6 h-6" />,
+      href: LINE_OA_URL,
+      variant: "outline" as const,
+      external: true,
+    },
+  ];
 
   return (
-    <AppShell title="今天的健康狀態" subtitle="資料每日自動同步，異常項目會優先提示">
-      <div className="grid gap-5 pb-8">
-        <section className="surface-card p-5 md:p-8">
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-5">
-            <div className="relative grid h-24 w-24 shrink-0 place-items-center rounded-full bg-accent">
-              <span className="text-3xl font-black text-primary tabular-nums">{healthScore}</span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-base font-bold">健康分數 良好</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                較上月 +3 分，主要來自步數達標天數提升。
-              </p>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${healthScore}%` }} />
-              </div>
-            </div>
-          </div>
-        </section>
+    <div className="min-h-screen bg-background">
+      <section className="bg-muted py-12 px-4">
+        <div className="max-w-3xl mx-auto text-center space-y-3">
+          <h1 className="text-2xl md:text-3xl font-bold">健康服務中心</h1>
+          <p className="text-muted-foreground">
+            大華醫事檢驗所 — 您的健康管理夥伴
+          </p>
+        </div>
+      </section>
 
-        <section className="grid grid-cols-2 gap-3">
-          {dailyMetrics.map((m) => (
-            <div key={m.id} className="surface-card p-4">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
-                <p className="min-w-0 truncate text-xs text-muted-foreground">{m.label}</p>
-                <StatusBadge status={m.status} />
-              </div>
-              <p className="mt-2 text-2xl font-black tabular-nums">
-                {m.value}
-                <span className="ml-1 text-xs font-medium text-muted-foreground">{m.unit}</span>
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">{m.hint}</p>
-            </div>
-          ))}
-        </section>
-
-        <StepsChart />
-
-        <section className="grid grid-cols-3 gap-3">
-          {quickLinks.map((q) => (
-            <Link key={q.to} to={q.to} className="surface-card flex flex-col items-center gap-1.5 p-4 text-center">
-              <q.icon className="h-5 w-5 text-primary" />
-              <span className="text-xs font-bold">{q.label}</span>
-              <span className="text-[10px] text-muted-foreground">{q.desc}</span>
-            </Link>
-          ))}
-        </section>
-
-        <section className="surface-card p-5 md:p-8">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-            <h2 className="min-w-0 truncate text-base font-bold">需要留意的檢驗值</h2>
-            <Link to="/reports" className="shrink-0 text-xs font-bold text-primary">
-              全部報告
-            </Link>
-          </div>
-          <div className="mt-4 grid gap-3">
-            {watchList.map((r) => (
-              <div key={r.id} className="flex items-center gap-3 rounded-2xl bg-secondary p-3.5">
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{r.name}</p>
-                  <p className="text-xs text-muted-foreground">參考值 {r.reference}</p>
+      <section className="max-w-3xl mx-auto px-4 py-10">
+        <div className="grid grid-cols-1 gap-4">
+          {actions.map((action) => (
+            <Card key={action.title} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                    {action.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg mb-1">{action.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {action.desc}
+                    </p>
+                    <Button variant={action.variant} size="sm" asChild>
+                      {action.external ? (
+                        <a
+                          href={action.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          開啟
+                        </a>
+                      ) : (
+                        <a href={action.href}>進入</a>
+                      )}
+                    </Button>
+                  </div>
                 </div>
-                <span className="shrink-0 text-sm font-bold tabular-nums">
-                  {r.value} {r.unit}
-                </span>
-                <StatusBadge status={r.status} />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <LineOaCard />
-
-      </div>
-    </AppShell>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }
