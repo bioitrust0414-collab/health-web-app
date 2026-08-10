@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DailyLogRouteImport } from './routes/daily-log'
 import { Route as HealthRouteImport } from './routes/health'
+import { Route as HealthEducationRouteImport } from './routes/health-education'
 import { Route as MemberRouteImport } from './routes/member'
 import { Route as RemindersRouteImport } from './routes/reminders'
 import { Route as ReportsRouteImport } from './routes/reports'
@@ -31,6 +32,11 @@ const DailyLogRoute = DailyLogRouteImport.update({
 const HealthRoute = HealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthEducationRoute = HealthEducationRouteImport.update({
+  id: '/health-education',
+  path: '/health-education',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MemberRoute = MemberRouteImport.update({
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/daily-log': typeof DailyLogRoute
   '/health': typeof HealthRoute
+  '/health-education': typeof HealthEducationRoute
   '/member': typeof MemberRoute
   '/reminders': typeof RemindersRoute
   '/reports': typeof ReportsRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/daily-log': typeof DailyLogRoute
   '/health': typeof HealthRoute
+  '/health-education': typeof HealthEducationRoute
   '/member': typeof MemberRoute
   '/reminders': typeof RemindersRoute
   '/reports': typeof ReportsRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/daily-log': typeof DailyLogRoute
   '/health': typeof HealthRoute
+  '/health-education': typeof HealthEducationRoute
   '/member': typeof MemberRoute
   '/reminders': typeof RemindersRoute
   '/reports': typeof ReportsRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/daily-log'
     | '/health'
+    | '/health-education'
     | '/member'
     | '/reminders'
     | '/reports'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/daily-log'
     | '/health'
+    | '/health-education'
     | '/member'
     | '/reminders'
     | '/reports'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/daily-log'
     | '/health'
+    | '/health-education'
     | '/member'
     | '/reminders'
     | '/reports'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DailyLogRoute: typeof DailyLogRoute
   HealthRoute: typeof HealthRoute
+  HealthEducationRoute: typeof HealthEducationRoute
   MemberRoute: typeof MemberRoute
   RemindersRoute: typeof RemindersRoute
   ReportsRoute: typeof ReportsRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/health'
       fullPath: '/health'
       preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health-education': {
+      id: '/health-education'
+      path: '/health-education'
+      fullPath: '/health-education'
+      preLoaderRoute: typeof HealthEducationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/member': {
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DailyLogRoute: DailyLogRoute,
   HealthRoute: HealthRoute,
+  HealthEducationRoute: HealthEducationRoute,
   MemberRoute: MemberRoute,
   RemindersRoute: RemindersRoute,
   ReportsRoute: ReportsRoute,
