@@ -1,12 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import dahuaCss from "@/styles/dahua.css?url";
 import { Navbar } from "@/components/dahua/Navbar";
 import { Footer } from "@/components/dahua/Footer";
+import { SocialFab } from "@/components/dahua/SocialFab";
 import { SectionHeader } from "@/components/dahua/SectionHeader";
 
 export const Route = createFileRoute("/health-education")({
   head: () => ({
     meta: [{ title: "衛教知識 - 大華醫事檢驗所" }],
+    links: [{ rel: "stylesheet", href: dahuaCss }],
   }),
   component: HealthEducationPage,
 });
@@ -30,40 +33,4 @@ function HealthEducationPage() {
         <SectionHeader badge="Health Education" title="衛教知識" desc="大華醫事檢驗所整理的健康資訊與營養知識，供會員參考。" />
 
         <div className="container" style={{ marginBottom: "32px" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center" }}>
-            {categories.map((cat) => (
-              <button key={cat} onClick={() => setFilter(cat)} style={{
-                padding: "8px 16px", borderRadius: "8px",
-                border: filter === cat ? "none" : "1px solid #e2e8f0",
-                background: filter === cat ? "#0f172a" : "#fff",
-                color: filter === cat ? "#fff" : "#334155",
-                fontSize: "0.875rem", cursor: "pointer",
-              }}>{cat}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="container" style={{ paddingBottom: "64px" }}>
-          <div className="products-grid">
-            {filtered.map((topic) => (
-              <div key={topic.id} className="product-card">
-                <div>
-                  <div style={{ fontSize: "0.85rem", color: "#0369a1", fontWeight: 600, marginBottom: "8px" }}>{topic.category}</div>
-                  <div className="product-name" style={{ marginBottom: "12px" }}>{topic.title}</div>
-                  <p style={{ color: "#64748b", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: "12px" }}>{topic.summary}</p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
-                    {topic.tags.map((tag) => (
-                      <span key={tag} style={{ fontSize: "0.75rem", background: "#f1f5f9", color: "#64748b", padding: "4px 10px", borderRadius: "6px" }}>{tag}</span>
-                    ))}
-                  </div>
-                </div>
-                <a href={`/health-topics/${topic.id}`} className="btn-primary" style={{ width: "100%", textAlign: "center" }}>閱讀完整內容 →</a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </>
-  );
-}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center"
