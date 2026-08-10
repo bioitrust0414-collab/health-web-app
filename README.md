@@ -1,10 +1,16 @@
-# 大華醫事檢驗所 — Web + LIFF 會員站
+# 大華醫事檢驗所 — 官方形象站
 
-大華醫事檢驗所（Dahua Medical Laboratory）的官方網站與 LINE LIFF 會員應用。
+大華醫事檢驗所（Dahua Medical Laboratory）的官方網站。
 
-**目前上線範圍：形象站 + LINE 登入 + 健檢預約。**
-商城、點數、集點卡與檢驗報告串接為刻意凍結的項目 —— 範圍邊界與復工條件
-請先讀 [`docs/ROADMAP.md`](docs/ROADMAP.md)，那份文件是這個 repo 的權威範圍說明。
+**目前上線範圍：形象站 + 衛教知識 + 透過 LINE 官方帳號預約諮詢。**
+
+本站**沒有會員系統，也不提供檢驗報告查詢**。會員登入、健康追蹤、報告查詢
+（原稱「健康 App」）已整批下線；預約諮詢改為前端把表單內容帶進 LINE 官方
+帳號的對話框，由訪客自行送出、門市在 LINE 人工跟進。
+
+因此本站是一個純靜態渲染的網站：**沒有資料庫、沒有登入、不儲存任何個人
+資料，也不需要任何環境變數。** 範圍邊界與凍結項目請讀
+[`docs/ROADMAP.md`](docs/ROADMAP.md)，那份文件是這個 repo 的權威範圍說明。
 
 ## 技術堆疊
 
@@ -12,8 +18,8 @@
 | --- | --- |
 | 框架 | TanStack Start（React 19 + Vite） |
 | 樣式 | Tailwind CSS 4 + shadcn/ui |
-| 資料 | Supabase（PostgREST，經 `src/lib/supabaseAdmin.ts` 以 REST 直呼） |
-| 登入 | LINE LIFF / LINE Login |
+| 資料 | 無（頁面內容為靜態資料，見 `src/data/`） |
+| 溝通管道 | LINE 官方帳號（連結集中在 `src/data/externalLinks.ts`） |
 | 部署 | Vercel |
 | 套件管理 | bun（`bun.lock`；請勿混入 npm/yarn/pnpm 的 lockfile） |
 
@@ -39,23 +45,23 @@ bun run dev
 
 ## 環境變數
 
-複製 `.env.example` 為 `.env` 並填入。所有變數的用途都寫在該檔案的註解中。
-`SUPABASE_SERVICE_ROLE_KEY` 會繞過 RLS，**只能存在於伺服器端**，絕不可加上
-`VITE_` 前綴。
+**本站不需要任何環境變數。** 詳見 `.env.example` 的說明 —— 該檔案目前只列出
+應該從 Vercel 專案設定中「刪掉」的舊變數。
 
 ## 目錄結構
 
 ```
 src/
   routes/          檔案式路由（見 src/routes/README.md 的命名慣例）
+    index.tsx        首頁形象站
+    health-education.tsx  衛教知識
   components/
-    dahua/         公開形象站的區塊元件
+    dahua/         形象站的區塊元件
     ui/            shadcn/ui 元件
-  lib/
-    *.server.ts    伺服器端專用，含 Supabase 與 LINE 整合
   data/
-    externalLinks.ts  站外導流連結的單一設定來源
-db/                Supabase schema
+    dahua.ts          健檢套組、基因檢測、比較表等頁面內容
+    externalLinks.ts  LINE 官方帳號與站外連結的單一設定來源
+db/                Supabase schema（保留作為未來的資料模型開口，目前無程式使用）
 docs/
   ROADMAP.md       範圍邊界、凍結項目、已知問題 ← 先讀這份
   lis-prototype/   LIS 檢驗中台串接草稿（未啟用）
@@ -63,8 +69,14 @@ docs/
 
 ## 安全須知
 
-`docs/ROADMAP.md` 的「已知問題」列有兩項**尚未修復的病歷外洩路徑**（項目 1
-與 2）。在那兩項修復之前，不應將本站以正式病歷查詢用途對外開放。
+本站**不儲存任何個人資料**：沒有資料庫連線、沒有登入、沒有 session，預約
+表單的內容只會被帶進訪客自己的 LINE 對話框，不經過伺服器。
+
+先前 ROADMAP 列的兩項病歷外洩路徑（`/member` 可用任意 profileId 讀取他人
+病歷、LINE webhook 無簽章驗證且手機號碼即綁定）已隨相關程式碼一併移除。
+
+⚠️ 日後 Phase 2 若恢復檢驗報告查詢，**必須連同雙因子驗證一起設計**，不可
+只把舊程式碼還原 —— 舊實作的兩個漏洞都源自「以為前端傳來的身分可信」。
 
 ## 與 Lovable 的關係
 
