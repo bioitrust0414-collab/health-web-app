@@ -1,6 +1,13 @@
-// 健康好夥伴 PWA service worker
-// 策略：靜態資源 cache-first，API / 動態頁面一律 network-first（避免報告、商城資料顯示過期快取）
-const CACHE_NAME = "health-app-shell-v1";
+// 大華醫事檢驗所 PWA service worker
+// 策略：靜態資源 cache-first，其餘走網路。
+//
+// ⚠️ 改動站上結構（尤其是移除頁面或入口）時，務必同步遞增 CACHE_NAME 的
+// 版本號。activate 只會刪掉「名稱不同」的舊快取，版本號不變則舊訪客的
+// 快取永遠不會失效，會繼續看到已經下線的功能。
+//
+// v2：會員系統與健康 App 下線（2026-08-10）。舊版快取中含有已移除的
+// 會員入口資源，必須強制失效。
+const CACHE_NAME = "dahua-site-shell-v2";
 const APP_SHELL = ["/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/favicon.ico"];
 
 self.addEventListener("install", (event) => {
@@ -24,14 +31,6 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-
-  // API 與 SSR 頁面：一律 network-first，失敗才退回快取，確保會員資料/報告不會顯示過期內容
-  if (url.pathname.startsWith("/api") || url.pathname.startsWith("/_serverFn")) {
-    event.respondWith(
-      fetch(request).catch(() => caches.match(request))
-    );
-    return;
-  }
 
   // 靜態資源：cache-first
   if (/\.(png|jpg|jpeg|webp|svg|ico|css|woff2?)$/.test(url.pathname)) {
