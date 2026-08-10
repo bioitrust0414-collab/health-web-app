@@ -1,6 +1,10 @@
+import { Link } from "@tanstack/react-router";
 import { SectionHeader } from "./SectionHeader";
 import indexData from "@/data/itrust/index.json";
 import type { EpisodeIndex } from "@/types/content";
+
+// 卡片與「瀏覽全部」原本都連到 /education，但該路由從不存在，長期 404。
+// 現已一律導向實際存在的 /health-education（見 docs/ROADMAP.md 項目 8）。
 
 const data = indexData as EpisodeIndex;
 const released = data.episodes.filter((ep) => ep.has_content);
@@ -44,20 +48,20 @@ export function EducationSection() {
                 </div>
                 <div className="product-desc">{ep.hook}</div>
               </div>
-              <a href={`/education/${ep.folder}`} className="product-action-btn">
+              <Link to="/health-education" className="product-action-btn">
                 閱讀全文 ➔
-              </a>
+              </Link>
             </div>
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: "32px" }}>
-          <a
-            href="/education"
+          <Link
+            to="/health-education"
             className="product-action-btn"
             style={{ display: "inline-block", width: "auto", padding: "12px 36px" }}
           >
             瀏覽全部衛教內容 ➔
-          </a>
+          </Link>
         </div>
       </div>
     </section>
