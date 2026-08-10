@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   ExternalLink,
@@ -9,8 +9,9 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號"; // ← 換成你的
-const LINE_PWA_URL = "https://liff.line.me/你的LIFF_ID";      // ← 換成你的
+// ← 換成你的真實網址
+const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號";
+const LINE_PWA_URL = "https://liff.line.me/你的LIFF_ID";
 
 export default function HealthPage() {
   const actions = [
@@ -70,19 +71,14 @@ export default function HealthPage() {
       <section className="max-w-3xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 gap-4">
           {actions.map((action) => (
-            <Card
-              key={action.title}
-              className="hover:shadow-md transition-shadow"
-            >
+            <Card key={action.title} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="p-3 rounded-lg bg-primary/10 text-primary">
                     {action.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg mb-1">
-                      {action.title}
-                    </h3>
+                    <h3 className="font-semibold text-lg mb-1">{action.title}</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       {action.desc}
                     </p>
