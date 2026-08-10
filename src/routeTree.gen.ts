@@ -10,28 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DailyLogRouteImport } from './routes/daily-log'
-import { Route as HealthRouteImport } from './routes/health'
 import { Route as HealthEducationRouteImport } from './routes/health-education'
-import { Route as MemberRouteImport } from './routes/member'
-import { Route as RemindersRouteImport } from './routes/reminders'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as TestsRouteImport } from './routes/tests'
-import { Route as AuthLineCallbackRouteImport } from './routes/auth.line.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DailyLogRoute = DailyLogRouteImport.update({
-  id: '/daily-log',
-  path: '/daily-log',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HealthRoute = HealthRouteImport.update({
-  id: '/health',
-  path: '/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthEducationRoute = HealthEducationRouteImport.update({
@@ -39,112 +22,31 @@ const HealthEducationRoute = HealthEducationRouteImport.update({
   path: '/health-education',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MemberRoute = MemberRouteImport.update({
-  id: '/member',
-  path: '/member',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RemindersRoute = RemindersRouteImport.update({
-  id: '/reminders',
-  path: '/reminders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TestsRoute = TestsRouteImport.update({
-  id: '/tests',
-  path: '/tests',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthLineCallbackRoute = AuthLineCallbackRouteImport.update({
-  id: '/auth/line/callback',
-  path: '/auth/line/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/daily-log': typeof DailyLogRoute
-  '/health': typeof HealthRoute
   '/health-education': typeof HealthEducationRoute
-  '/member': typeof MemberRoute
-  '/reminders': typeof RemindersRoute
-  '/reports': typeof ReportsRoute
-  '/tests': typeof TestsRoute
-  '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/daily-log': typeof DailyLogRoute
-  '/health': typeof HealthRoute
   '/health-education': typeof HealthEducationRoute
-  '/member': typeof MemberRoute
-  '/reminders': typeof RemindersRoute
-  '/reports': typeof ReportsRoute
-  '/tests': typeof TestsRoute
-  '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/daily-log': typeof DailyLogRoute
-  '/health': typeof HealthRoute
   '/health-education': typeof HealthEducationRoute
-  '/member': typeof MemberRoute
-  '/reminders': typeof RemindersRoute
-  '/reports': typeof ReportsRoute
-  '/tests': typeof TestsRoute
-  '/auth/line/callback': typeof AuthLineCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/daily-log'
-    | '/health'
-    | '/health-education'
-    | '/member'
-    | '/reminders'
-    | '/reports'
-    | '/tests'
-    | '/auth/line/callback'
+  fullPaths: '/' | '/health-education'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/daily-log'
-    | '/health'
-    | '/health-education'
-    | '/member'
-    | '/reminders'
-    | '/reports'
-    | '/tests'
-    | '/auth/line/callback'
-  id:
-    | '__root__'
-    | '/'
-    | '/daily-log'
-    | '/health'
-    | '/health-education'
-    | '/member'
-    | '/reminders'
-    | '/reports'
-    | '/tests'
-    | '/auth/line/callback'
+  to: '/' | '/health-education'
+  id: '__root__' | '/' | '/health-education'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DailyLogRoute: typeof DailyLogRoute
-  HealthRoute: typeof HealthRoute
   HealthEducationRoute: typeof HealthEducationRoute
-  MemberRoute: typeof MemberRoute
-  RemindersRoute: typeof RemindersRoute
-  ReportsRoute: typeof ReportsRoute
-  TestsRoute: typeof TestsRoute
-  AuthLineCallbackRoute: typeof AuthLineCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -156,20 +58,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/daily-log': {
-      id: '/daily-log'
-      path: '/daily-log'
-      fullPath: '/daily-log'
-      preLoaderRoute: typeof DailyLogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/health': {
-      id: '/health'
-      path: '/health'
-      fullPath: '/health'
-      preLoaderRoute: typeof HealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/health-education': {
       id: '/health-education'
       path: '/health-education'
@@ -177,54 +65,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HealthEducationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/member': {
-      id: '/member'
-      path: '/member'
-      fullPath: '/member'
-      preLoaderRoute: typeof MemberRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reminders': {
-      id: '/reminders'
-      path: '/reminders'
-      fullPath: '/reminders'
-      preLoaderRoute: typeof RemindersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tests': {
-      id: '/tests'
-      path: '/tests'
-      fullPath: '/tests'
-      preLoaderRoute: typeof TestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/line/callback': {
-      id: '/auth/line/callback'
-      path: '/auth/line/callback'
-      fullPath: '/auth/line/callback'
-      preLoaderRoute: typeof AuthLineCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DailyLogRoute: DailyLogRoute,
-  HealthRoute: HealthRoute,
   HealthEducationRoute: HealthEducationRoute,
-  MemberRoute: MemberRoute,
-  RemindersRoute: RemindersRoute,
-  ReportsRoute: ReportsRoute,
-  TestsRoute: TestsRoute,
-  AuthLineCallbackRoute: AuthLineCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
