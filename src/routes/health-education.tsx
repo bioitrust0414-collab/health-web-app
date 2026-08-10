@@ -1,9 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/dahua/Navbar";
+import { Footer } from "@/components/dahua/Footer";
+import { SectionHeader } from "@/components/dahua/SectionHeader";
+import dahuaCss from "@/styles/dahua.css?url";
 
 export const Route = createFileRoute("/health-education")({
+  head: () => ({
+    meta: [{ title: "衛教知識 - 大華醫事檢驗所" }],
+    links: [{ rel: "stylesheet", href: dahuaCss }],
+  }),
   component: HealthEducationPage,
 });
 
@@ -46,61 +52,86 @@ function HealthEducationPage() {
     filter === "全部" ? healthTopics : healthTopics.filter((t) => t.category === filter);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gray-100 py-12 px-4 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">衛教知識</h1>
-        <p className="text-gray-600">大華醫事檢驗所整理的健康資訊與營養知識</p>
-      </div>
+    <>
+      <Navbar />
+      <main style={{ paddingTop: "80px", minHeight: "100vh", background: "#f8fafc" }}>
+        <SectionHeader
+          badge="Health Education"
+          title="衛教知識"
+          desc="大華醫事檢驗所整理的健康資訊與營養知識，供會員參考。"
+        />
 
-      {/* Filter */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
-        <div className="flex flex-wrap gap-2 justify-center">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filter === cat
-                  ? "bg-gray-900 text-white"
-                  : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-100"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        {/* Filter */}
+        <div className="container" style={{ marginBottom: "32px" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center" }}>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  border: filter === cat ? "none" : "1px solid #e2e8f0",
+                  background: filter === cat ? "#0f172a" : "#fff",
+                  color: filter === cat ? "#fff" : "#334155",
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Cards */}
-      <div className="max-w-5xl mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((topic) => (
-            <Card key={topic.id} className="border border-gray-200">
-              <CardHeader className="pb-2">
-                <p className="text-sm text-gray-500 mb-1">{topic.category}</p>
-                <CardTitle className="text-lg">{topic.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-gray-600 text-sm leading-relaxed">{topic.summary}</p>
-                <div className="flex flex-wrap gap-2">
-                  {topic.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+        {/* Cards */}
+        <div className="container" style={{ paddingBottom: "64px" }}>
+          <div className="products-grid">
+            {filtered.map((topic) => (
+              <div key={topic.id} className="product-card">
+                <div>
+                  <div
+                    style={{
+                      fontSize: "0.85rem",
+                      color: "#0369a1",
+                      fontWeight: 600,
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {topic.category}
+                  </div>
+                  <div className="product-name" style={{ marginBottom: "12px" }}>
+                    {topic.title}
+                  </div>
+                  <p style={{ color: "#64748b", fontSize: "0.875rem", lineHeight: 1.6, marginBottom: "12px" }}>
+                    {topic.summary}
+                  </p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
+                    {topic.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        style={{
+                          fontSize: "0.75rem",
+                          background: "#f1f5f9",
+                          color: "#64748b",
+                          padding: "4px 10px",
+                          borderRadius: "6px",
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <Button className="w-full" asChild>
-                  <a href={`/health-topics/${topic.id}`}>閱讀完整內容</a>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                <a href={`/health-topics/${topic.id}`} className="btn-primary" style={{ width: "100%", textAlign: "center" }}>
+                  閱讀完整內容 →
+                </a>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 }
