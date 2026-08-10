@@ -9,9 +9,11 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-// ← 換成你的真實網址
+// ← 請換成你的 LINE OA 真實網址
 const LINE_OA_URL = "https://line.me/R/ti/p/@你的LINEOA帳號";
-const LINE_PWA_URL = "https://liff.line.me/你的LIFF_ID";
+
+// ✅ 已填入真實 LIFF URL
+const LINE_PWA_URL = "https://liff.line.me/2010848952-VfGV0qlc";
 
 export default function HealthPage() {
   const actions = [
