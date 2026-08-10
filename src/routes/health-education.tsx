@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import dahuaCss from "@/styles/dahua.css?url";
 import { Navbar } from "@/components/dahua/Navbar";
 import { Footer } from "@/components/dahua/Footer";
 import { SocialFab } from "@/components/dahua/SocialFab";
@@ -9,7 +8,6 @@ import { SectionHeader } from "@/components/dahua/SectionHeader";
 export const Route = createFileRoute("/health-education")({
   head: () => ({
     meta: [{ title: "衛教知識 - 大華醫事檢驗所" }],
-    links: [{ rel: "stylesheet", href: dahuaCss }],
   }),
   component: HealthEducationPage,
 });
