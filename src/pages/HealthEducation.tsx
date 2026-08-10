@@ -72,4 +72,87 @@ export default function HealthEducationPage() {
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
             衛教知識
           </h1>
-          <p className="text-muted
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            大華醫事檢驗所整理的健康資訊與營養知識。
+            點擊「前往選購」可至合作商店查看相關產品。
+          </p>
+        </div>
+      </section>
+
+      {/* Filter */}
+      <section className="max-w-5xl mx-auto px-4 py-8">
+        <div className="flex flex-wrap gap-2 justify-center">
+          {categories.map((cat) => (
+            <Button
+              key={cat}
+              variant={filter === cat ? "default" : "outline"}
+              size="sm"
+              onClick={() => setFilter(cat)}
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
+      </section>
+
+      {/* Cards */}
+      <section className="max-w-5xl mx-auto px-4 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filtered.map((topic) => (
+            <Card
+              key={topic.id}
+              className="hover:shadow-lg transition-shadow border-border/60"
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    {topic.icon}
+                    <span className="text-sm font-medium">{topic.category}</span>
+                  </div>
+                  {topic.hasProduct && (
+                    <Badge variant="default">可選購</Badge>
+                  )}
+                </div>
+                <CardTitle className="text-xl leading-tight">
+                  {topic.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground leading-relaxed">
+                  {topic.summary}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {topic.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs bg-muted px-2 py-1 rounded-md text-muted-foreground"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button variant="default" className="flex-1" asChild>
+                    <a href={`/health-topics/${topic.id}`}>閱讀完整內容</a>
+                  </Button>
+                  {topic.externalUrl && (
+                    <Button variant="outline" asChild>
+                      <a
+                        href={topic.externalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        前往選購
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
