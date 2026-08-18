@@ -137,7 +137,7 @@ public/
 
 ## 維護規則
 
-本專案與 [Lovable](https://lovable.dev) 連動。請保持 `main` 隨時可建置，不要對已推送的歷史執行 force push、rebase、amend 或 squash，以免改寫 Lovable 端的專案歷史。新增或刪除路由後，請執行 `bun run build` 並提交更新後的 `src/routeTree.gen.ts`；修改依賴時必須一併更新 `bun.lock`。
+請保持 `main` 隨時可建置。新增或刪除路由後，請執行 `bun run build` 並提交更新後的 `src/routeTree.gen.ts`；修改依賴時必須一併更新 `bun.lock`。
 
 在進行任何會員、報告查詢、金流或個資流程之前，請先閱讀 [`docs/ROADMAP.md`](docs/ROADMAP.md)，確認工作不會越過目前 Phase 1 的產品邊界。
 
@@ -149,7 +149,6 @@ public/
 | [`.env.example`](.env.example) | 目前不需要環境變數，以及舊部署變數的清理清單。 |
 | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) | CI 觸發條件與必要驗證。 |
 | [`src/routes/README.md`](src/routes/README.md) | 路由檔案命名與維護慣例。 |
-| [`AGENTS.md`](AGENTS.md) | 儲存庫協作者與自動化工具的工作規範。 |
 
 ## 授權
 
