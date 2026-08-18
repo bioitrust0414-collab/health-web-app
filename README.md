@@ -153,3 +153,18 @@ public/
 ## 授權
 
 儲存庫目前未提供 `LICENSE` 檔案。如需將程式碼、內容或視覺資產散布到專案外，請先向專案擁有者確認授權範圍。
+
+## Vercel 部署資訊
+
+以下資訊依 2026-08-19 提供的 Vercel Projects 截圖整理：
+
+| 項目 | 資訊 |
+|---|---|
+| Vercel Project | `dahua_project_1` |
+| GitHub Repository | [`bioitrust0414-collab/dahua_project_001`](https://github.com/bioitrust0414-collab/dahua_project_001) |
+| Production domain | [health-web-app-omega.vercel.app](https://health-web-app-omega.vercel.app) |
+| 用途 | 大華醫事檢驗所 Phase 1 官方形象站；不是會員健康 App |
+
+請注意，Vercel Project 顯示名稱 `dahua_project_1` 與 GitHub repository `dahua_project_001` 並不完全相同；兩者的對應關係依使用者提供的 Vercel Projects 截圖記錄。若日後在 Vercel 重新命名 project，應同步更新本節，但不必因此修改 GitHub repository 名稱。
+
+本專案目前沒有會員登入、檢驗報告查詢或資料庫服務；部署前主要確認 build、PWA 靜態資產、Service Worker、LINE 預約連結與正式 domain 設定即可。
